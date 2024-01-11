@@ -4,23 +4,23 @@
 GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -linkmode=external -compressdwarf=false -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags'" -a -v %{?**};
 
 %global import_path github.com/containers/podman
-%global branch v4.4.1-rhel
-%global commit0 dd490ff9437da53c0c2af8fca9c7c167ab0acbca
+%global branch v4.6.1-rhel
+%global commit0 ea33dce70f1b9d6f60faa405f57ed791a89cd751
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 #%%global dnsnamever 1.3.0
 %global commit_dnsname 18822f9a4fb35d1349eb256f4cd2bfd372474d84
 %global shortcommit_dnsname %(c=%{commit_dnsname}; echo ${c:0:7})
 %global gvproxyrepo gvisor-tap-vsock
-%global gvproxyver 0.5.0
-%global commit_gvproxy aab0ac9367fc5142f5857c36ac2352bcb3c60ab7
+%global gvproxyver 0.6.1
+%global commit_gvproxy 407efb5dcdb0f4445935f7360535800b60447544
 
 Epoch: 2
 Name: podman
-Version: 4.4.1
-Release: 13%{?dist}
+Version: 4.6.1
+Release: 5%{?dist}
 Summary: Manage Pods, Containers and Container Images
-License: ASL 2.0 and GPLv3+
+License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
 %if 0%{?branch:1}
 Source0: https://%{import_path}/tarball/%{commit0}/%{branch}-%{shortcommit0}.tar.gz
@@ -37,12 +37,12 @@ Provides: %{name}-manpages = %{epoch}:%{version}-%{release}
 Obsoletes: %{name}-manpages < %{epoch}:%{version}-%{release}
 Provides: %{name}-catatonit = %{epoch}:%{version}-%{release}
 Obsoletes: %{name}-catatonit < 2:4.4.0
+BuildRequires: gettext
 BuildRequires: golang >= 1.17.5
 BuildRequires: glib2-devel
 BuildRequires: glibc-devel
 BuildRequires: glibc-static
 BuildRequires: git-core
-BuildRequires: /usr/bin/go-md2man
 BuildRequires: gpgme-devel
 BuildRequires: libassuan-devel
 BuildRequires: libgpg-error-devel
@@ -73,6 +73,9 @@ Requires: slirp4netns >= 0.4.0-1
 Recommends: crun
 Requires: fuse-overlayfs
 Requires: oci-runtime
+Provides: podmansh = %{epoch}:%{version}-%{release}
+Provides: podman-podmansh = %{epoch}:%{version}-%{release}
+Provides: podman-shell = %{epoch}:%{version}-%{release}
 
 %description
 %{name} (Pod Manager) is a fully featured container engine that is a simple
@@ -187,7 +190,7 @@ if [ $? != 0 ]; then
 fi
 popd
 
-export GO111MODULE=off
+export GO111MODULE=on
 export GOPATH=$(pwd)/_build:$(pwd)
 CGO_CFLAGS="%{optflags} -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
 # These extra flags present in $CFLAGS have been skipped for now as they break the build
@@ -226,6 +229,7 @@ export BUILDTAGS="remote $BUILDTAGS"
 %gobuild -o bin/quadlet %{import_path}/cmd/quadlet
 
 %{__make} docs
+%{__make} docker-docs
 
 # build dnsname plugin
 unset LDFLAGS
@@ -258,7 +262,13 @@ PODMAN_VERSION=%{version} %{__make} PREFIX=%{buildroot}%{_prefix} ETCDIR=%{build
         install.man \
         install.systemd \
         install.completions \
-        install.docker
+        install.docker \
+        install.docker-docs
+
+sed -i 's;%{buildroot};;g' %{buildroot}%{_bindir}/docker
+
+# remove unwanted man pages
+rm -f %{buildroot}%{_mandir}/man5/docker*.5
 
 # install test scripts, but not the internal helpers.t meta-test
 ln -s ./ ./vendor/src # ./vendor/src -> ./vendor
@@ -328,6 +338,7 @@ fi
 %license LICENSE COPYING-catatonit
 %doc README.md CONTRIBUTING.md install.md transfer.md
 %{_bindir}/%{name}
+%{_bindir}/%{name}sh
 %{_libexecdir}/%{name}/quadlet
 %{_libexecdir}/%{name}/rootlessport
 %{_datadir}/bash-completion/completions/%{name}
@@ -353,8 +364,9 @@ fi
 
 %files docker
 %{_bindir}/docker
-%{_usr}/lib/tmpfiles.d/%{name}-docker.conf
-%{_datadir}/user-tmpfiles.d/podman-docker.conf
+%{_mandir}/man1/docker*.1*
+%{_tmpfilesdir}/%{name}-docker.conf
+%{_user_tmpfilesdir}/%{name}-docker.conf
 
 %files remote
 %license LICENSE
@@ -384,49 +396,117 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
-* Thu Aug 17 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-13
-- update to the latest content of https://github.com/containers/podman/tree/v4.4.1-rhel
-  (https://github.com/containers/podman/commit/dd490ff)
-- Resolves: #2229749
+* Fri Aug 25 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-5
+- update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
+  (https://github.com/containers/podman/commit/ea33dce)
+- Related: #2176063
 
-* Thu Jun 15 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-12
-- update to the latest content of https://github.com/containers/podman/tree/v4.4.1-rhel
-  (https://github.com/containers/podman/commit/ff30585)
-- Resolves: #2213844
+* Tue Aug 22 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-4
+- amend podmansh provides
+- Related: #2176063
 
-* Fri Jun 09 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-11
-- fix --dns-add get error logs when there is no container attached to the network
-- Resolves: #2210118
+* Tue Aug 22 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-3
+- update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
+  (https://github.com/containers/podman/commit/8bb0204)
+- Related: #2176063
 
-* Wed Jun 07 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-10
-- update to the latest content of https://github.com/containers/podman/tree/v4.4.1-rhel
-  (https://github.com/containers/podman/commit/bcea446)
-- Resolves: #2210113
+* Wed Aug 16 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-2
+- update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
+  (https://github.com/containers/podman/commit/1b2fadd)
+- Resolves: #2232127
 
-* Wed Apr 26 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-9
-- update to the latest content of https://github.com/containers/podman/tree/v4.4.1-rhel
-  (https://github.com/containers/podman/commit/aa5db47)
-- Resolves: #2189592
+* Fri Aug 11 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-1
+- update to latest content of https://github.com/containers/podman/releases/tag/4.6.1
+- Related: #2176063
 
-* Fri Apr 14 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-8
+* Fri Aug 04 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.0-3
+- build podman 4.6.0 off main branch for early testing of zstd compression
+- Related: #2176063
+
+* Fri Aug 04 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.0-2
+- update license token to be SPDX compatible
+- Related: #2176063
+
+* Fri Jul 21 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.0-1
+- update to latest content of https://github.com/containers/podman/releases/tag/4.6.0
+  (https://github.com/containers/podman/commit/38e6fab9664c6e59b66e73523b307a56130316ae)
+
+* Fri Jul 14 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.0-0.3
+- rebuild with the new bats
+- Related: #2176063
+
+* Fri Jul 14 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.0-0.2
+- update to 4.6.0-rc2
+- Related: #2176063
+
+* Mon Jul 10 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.0-0.1
+- update to 4.6.0-rc1
+- Related: #2176063
+
+* Wed Jun 14 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.5.1-5
+- rebuild for following CVEs:
+CVE-2023-25173 CVE-2022-41724 CVE-2022-41725 CVE-2023-24537 CVE-2023-24538 CVE-2023-24534 CVE-2023-24536 CVE-2022-41723 CVE-2023-24539 CVE-2023-24540 CVE-2023-29400
+- Resolves: #2175071
+- Resolves: #2179950
+- Resolves: #2187318
+- Resolves: #2187366
+- Resolves: #2203681
+- Resolves: #2207512
+
+* Wed Jun 14 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.5.1-4
+- update to https://github.com/containers/gvisor-tap-vsock/releases/tag/v0.6.1
+- Related: #2176063
+
+* Wed Jun 14 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.5.1-3
+- rebuild for following CVEs:
+CVE-2023-25173 CVE-2022-41724 CVE-2022-41725 CVE-2023-24537 CVE-2023-24538 CVE-2023-24534 CVE-2023-24536 CVE-2022-41723 CVE-2023-24539 CVE-2023-24540 CVE-2023-29400
+- Resolves: #2175074
+- Resolves: #2179966
+- Resolves: #2187322
+- Resolves: #2187383
+- Resolves: #2203702
+- Resolves: #2207522
+
+* Fri Jun 09 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.5.1-2
+- rebuild
+- Resolves: #2177611
+
+* Fri Jun 02 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.5.1-1
+- update to https://github.com/containers/podman/releases/tag/v4.5.1
+- Related: #2176063
+
+* Wed Apr 19 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.5.0-1
+- update to 4.5.0
+- Related: #2176063
+
+* Tue Apr 18 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-10
+- build and add missing docker man pages
+- Resolves: #2187187
+
+* Fri Apr 14 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-9
 - update to the latest content of https://github.com/containers/podman/tree/v4.4.1-rhel
   (https://github.com/containers/podman/commit/fd0ea3b)
-- Resolves: #2177925
+- Resolves: #2173089
 
-* Mon Apr 03 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-7
+* Mon Apr 03 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-8
 - update to the latest content of https://github.com/containers/podman/tree/v4.4.1-rhel
   (https://github.com/containers/podman/commit/05037d3)
-- Resolves: #2183602
+- Resolves: #2178263
 
-* Fri Mar 31 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-6
+* Fri Mar 31 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-7
 - update to the latest content of https://github.com/containers/podman/tree/v4.4.1-rhel
   (https://github.com/containers/podman/commit/67f7e1e)
-- Resolves: #2182492
+- Related: #2176063
+
+* Fri Mar 24 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-6
+- update to the latest content of https://github.com/containers/podman/tree/v4.4.1-rhel
+  (https://github.com/containers/podman/commit/4461c9c)
+- Related: #2176063
 
 * Tue Mar 21 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-5
 - update to the latest content of https://github.com/containers/podman/tree/v4.4.1-rhel
   (https://github.com/containers/podman/commit/bf400bd)
-- Resolves: #2180126
+- Related: #2176063
 
 * Mon Mar 20 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.4.1-4
 - update to the latest content of https://github.com/containers/podman/tree/v4.4.1-rhel
