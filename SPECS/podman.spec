@@ -8,20 +8,20 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.6.1-rhel
-%global commit0 ea33dce70f1b9d6f60faa405f57ed791a89cd751
+%global commit0 227b84e26d5526dc4f4b3b2dba81610c0db8932c
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 #%%global dnsnamever 1.3.0
 %global commit_dnsname 18822f9a4fb35d1349eb256f4cd2bfd372474d84
 %global shortcommit_dnsname %(c=%{commit_dnsname}; echo ${c:0:7})
 %global gvproxyrepo gvisor-tap-vsock
-%global gvproxyver 0.6.1
-%global commit_gvproxy 407efb5dcdb0f4445935f7360535800b60447544
+%global gvproxyver 0.7.1
+%global commit_gvproxy 97028a6a6d6af2f26680f4fdf9dd15323de07804
 
 Epoch: 3
 Name: podman
 Version: 4.6.1
-Release: 4%{?dist}
+Release: 8%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -39,7 +39,7 @@ ExclusiveArch: %{go_arches}
 Provides: %{name}-manpages = %{epoch}:%{version}-%{release}
 Obsoletes: %{name}-manpages < %{epoch}:%{version}-%{release}
 BuildRequires: %{_bindir}/envsubst
-BuildRequires: golang >= 1.17.7
+BuildRequires: golang >= 1.20.6
 BuildRequires: glib2-devel
 BuildRequires: glibc-devel
 BuildRequires: glibc-static
@@ -423,6 +423,23 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Tue Jan 23 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.6.1-8
+- Make the module buildable again
+- Resolves: RHEL-16299
+
+* Fri Jan 19 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.6.1-7
+- update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
+  (https://github.com/containers/podman/commit/227b84e)
+- Resolves: RHEL-20910
+
+* Thu Jan 18 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.6.1-6
+- Update gvproxy to be rebuildable with newer versions of golang
+- Related: RHEL-19138
+
+* Mon Dec 04 2023 Lokesh Mandvekar <lsm5@redhat.com> - 3:4.6.1-5
+- Rebuild with golang 1.20.10 for CVE-2023-39321
+- Related: Jira:RHEL-4515
+
 * Fri Aug 25 2023 Jindrich Novy <jnovy@redhat.com> - 3:4.6.1-4
 - update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
   (https://github.com/containers/podman/commit/ea33dce)
