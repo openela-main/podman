@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.6.1-rhel
-%global commit0 ea33dce70f1b9d6f60faa405f57ed791a89cd751
+%global commit0 68e7ae09d941e31d8f234af6a9534866b31aa141
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 #%%global dnsnamever 1.3.0
@@ -18,7 +18,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 2
 Name: podman
 Version: 4.6.1
-Release: 5%{?dist}
+Release: 7%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -38,7 +38,7 @@ Obsoletes: %{name}-manpages < %{epoch}:%{version}-%{release}
 Provides: %{name}-catatonit = %{epoch}:%{version}-%{release}
 Obsoletes: %{name}-catatonit < 2:4.4.0
 BuildRequires: gettext
-BuildRequires: golang >= 1.17.5
+BuildRequires: golang >= 1.20.10
 BuildRequires: glib2-devel
 BuildRequires: glibc-devel
 BuildRequires: glibc-static
@@ -396,6 +396,18 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Sat Dec 02 2023 Lokesh Mandvekar <lsm5@redhat.com> - 2:4.6.1-7
+- Rebuild for following CVEs:
+  CVE-2023-39318 CVE-2023-39319 CVE-2023-39321 CVE-2023-39322 CVE-2023-29409
+- Related: Jira:RHEL-2785
+- Related: Jira:RHEL-7452
+
+* Fri Sep 29 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-6
+- update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
+  (https://github.com/containers/podman/commit/68e7ae0)
+- Related: Jira:RHEL-2785
+- Related: Jira:RHEL-7452
+
 * Fri Aug 25 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-5
 - update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
   (https://github.com/containers/podman/commit/ea33dce)
