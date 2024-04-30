@@ -4,17 +4,17 @@
 GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -linkmode=external -compressdwarf=false -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags'" -a -v %{?**};
 
 %global import_path github.com/containers/podman
-%global branch v4.9
-%global commit0 4b69d939e692aeab7f10d3757458e3c201da8fbb
+%global branch v4.9-rhel
+%global commit0 7752c56006f06fc608bf40a12ceb564ab6b045c9
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
 %global shortcommit_dnsname %(c=%{commit_dnsname}; echo ${c:0:7})
 
-Epoch: 2
+Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 0.1%{?dist}
+Release: 3%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -358,6 +358,39 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Mon Apr 15 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-3
+- rebuild
+- Related: RHEL-28234
+
+* Wed Apr 03 2024 Lokesh Mandvekar <lsm5@redhat.com> - 4:4.9.4-2
+- bump Epoch to 4 to preserve upgrade path from rhel 8.10
+- bump release tag or else it refuses to build
+- Resolves: RHEL-28234
+
+* Wed Apr 03 2024 Lokesh Mandvekar <lsm5@redhat.com> - 4:4.9.4-1
+- bump Epoch to 4 to preserve upgrade path from rhel 8.10
+- Resolves: RHEL-28234
+
+* Mon Apr 01 2024 Lokesh Mandvekar <lsm5@redhat.com> - 3:4.9.4-1
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/7752c56)
+- Resolves: RHEL-28234
+
+* Tue Mar 19 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.9.3-3
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/5f872ae)
+- Resolves: RHEL-28234
+
+* Thu Mar 14 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.9.3-2
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/06e4598)
+- Resolves: RHEL-28636
+
+* Fri Mar 08 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.9.3-1
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/c82fdc8)
+- Resolves: RHEL-28633 RHEL-28629
+
 * Tue Feb 20 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.9.4-0.1
 - update to the latest content of https://github.com/containers/podman/tree/v4.9
   (https://github.com/containers/podman/commit/4b69d93)
