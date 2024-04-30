@@ -4,21 +4,17 @@
 GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -linkmode=external -compressdwarf=false -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags'" -a -v %{?**};
 
 %global import_path github.com/containers/podman
-%global branch v4.6.1-rhel
-%global commit0 22c230846c6a5a48968b1880398e99892b060cc3
+%global branch v4.9
+%global commit0 4b69d939e692aeab7f10d3757458e3c201da8fbb
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
-#%%global dnsnamever 1.3.0
-%global commit_dnsname 18822f9a4fb35d1349eb256f4cd2bfd372474d84
+%global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
 %global shortcommit_dnsname %(c=%{commit_dnsname}; echo ${c:0:7})
-%global gvproxyrepo gvisor-tap-vsock
-%global gvproxyver 0.6.1
-%global commit_gvproxy 407efb5dcdb0f4445935f7360535800b60447544
 
 Epoch: 2
 Name: podman
-Version: 4.6.1
-Release: 9%{?dist}
+Version: 4.9.4
+Release: 0.1%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -30,7 +26,6 @@ Source0: https://%{import_path}/archive/%{commit0}/%{name}-%{version}-%{shortcom
 Source1: https://github.com/openSUSE/catatonit/archive/v%{cataver}.tar.gz
 #Source2: https://github.com/containers/dnsname/archive/v%%{dnsnamever}.tar.gz
 Source2: https://github.com/containers/dnsname/archive/%{commit_dnsname}/dnsname-%{shortcommit_dnsname}.tar.gz
-Source4: https://github.com/containers/gvisor-tap-vsock/archive/%{commit_gvproxy}/gvisor-tap-vsock-%{commit_gvproxy}.tar.gz
 # https://fedoraproject.org/wiki/PackagingDrafts/Go#Go_Language_Architectures
 ExclusiveArch: %{go_arches}
 Provides: %{name}-manpages = %{epoch}:%{version}-%{release}
@@ -118,7 +113,7 @@ variables, or in containers.conf.
 %package plugins
 Summary: Plugins for %{name}
 Requires: dnsmasq
-Recommends: %{name}-gvproxy = %{epoch}:%{version}-%{release}
+Recommends: gvisor-tap-vsock
 
 %description plugins
 This plugin sets up the use of dnsmasq on a given CNI network so
@@ -147,15 +142,6 @@ Requires: git-daemon
 
 This package contains system tests for %{name}
 
-%package gvproxy
-Summary: Go replacement for libslirp and VPNKit
-
-%description gvproxy
-A replacement for libslirp and VPNKit, written in pure Go.
-It is based on the network stack of gVisor. Compared to libslirp,
-gvisor-tap-vsock brings a configurable DNS server and
-dynamic port forwarding.
-
 %prep
 %if 0%{?branch:1}
 %autosetup -Sgit -n containers-%{name}-%{shortcommit0}
@@ -169,7 +155,6 @@ pushd catatonit-%{cataver}
 sed -i '$d' configure.ac
 popd
 tar fx %{SOURCE2}
-tar fx %{SOURCE4}
 
 # this is shipped by skopeo: containers-common subpackage
 rm -rf docs/source/markdown/containers-mounts.conf.5.md
@@ -244,17 +229,6 @@ export GOPATH=$(pwd)/_build:$(pwd)
 %gobuild -o bin/dnsname github.com/containers/dnsname/plugins/meta/dnsname
 popd
 
-pushd gvisor-tap-vsock-%{commit_gvproxy}
-mkdir _build
-pushd _build
-mkdir -p src/github.com/containers
-ln -s ../../../../ src/github.com/containers/gvisor-tap-vsock
-popd
-ln -s vendor src
-export GOPATH=$(pwd)/_build:$(pwd)
-%gobuild -o bin/gvproxy github.com/containers/gvisor-tap-vsock/cmd/gvproxy
-popd
-
 %install
 PODMAN_VERSION=%{version} %{__make} PREFIX=%{buildroot}%{_prefix} ETCDIR=%{buildroot}%{_sysconfdir} \
         install.bin \
@@ -290,12 +264,6 @@ install -p catatonit-%{cataver}/COPYING %{buildroot}%{_datadir}/licenses/podman/
 # install dnsname plugin
 pushd dnsname-%{commit_dnsname}
 %{__make} PREFIX=%{_prefix} DESTDIR=%{buildroot} install
-popd
-
-# install gvproxy
-pushd gvisor-tap-vsock-%{commit_gvproxy}
-install -dp %{buildroot}%{_libexecdir}/%{name}
-install -p -m0755 bin/gvproxy %{buildroot}%{_libexecdir}/%{name}
 popd
 
 %check
@@ -389,34 +357,62 @@ fi
 %license LICENSE
 %{_datadir}/%{name}/test
 
-%files gvproxy
-%license gvisor-tap-vsock-%{commit_gvproxy}/LICENSE
-%doc gvisor-tap-vsock-%{commit_gvproxy}/README.md
-%dir %{_libexecdir}/%{name}
-%{_libexecdir}/%{name}/gvproxy
-
 %changelog
-* Fri Apr 19 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-9
-- update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
-  (https://github.com/containers/podman/commit/22c2308)
-- Resolves: RHEL-20491
+* Tue Feb 20 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.9.4-0.1
+- update to the latest content of https://github.com/containers/podman/tree/v4.9
+  (https://github.com/containers/podman/commit/4b69d93)
+- Related: RHEL-2112
 
-* Fri Jan 19 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-8
-- update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
-  (https://github.com/containers/podman/commit/227b84e)
-- Resolves: RHEL-20911
+* Fri Feb 09 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.9.3-0.1
+- update to the latest content of https://github.com/containers/podman/tree/v4.9
+  (https://github.com/containers/podman/commit/b8a887c)
+- Related: RHEL-2112
 
-* Sat Dec 02 2023 Lokesh Mandvekar <lsm5@redhat.com> - 2:4.6.1-7
+* Tue Feb 06 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.9.2-1
+- update to the latest content of https://github.com/containers/podman/tree/v4.9
+  (https://github.com/containers/podman/commit/4c14019)
+- Related: RHEL-2112
+
+* Thu Feb 01 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.9.1-1
+- switch to v4.9.1-rhel branch
+- update dnsname to the latest commit
+- Related: Jira:RHEL-2112
+
+* Tue Jan 23 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.9.0-1
+- update to https://github.com/containers/podman/releases/tag/v4.9.0
+- Related: RHEL-2112
+
+* Thu Jan 04 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.8.3-1
+- update to https://github.com/containers/podman/releases/tag/v4.8.3
+- Related: RHEL-2112
+
+* Tue Jan 02 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.8.2-1
+- update to https://github.com/containers/podman/releases/tag/v4.8.2
+- Related: RHEL-2112
+
+* Wed Dec 06 2023 Lokesh Mandvekar <lsm5@redhat.com> - 2:4.8.1-1
+- update to latest content of https://github.com/containers/podman/releases/tag/4.8.1
+- Related: Jira:RHEL-2112
+
+* Sat Dec 02 2023 Lokesh Mandvekar <lsm5@redhat.com> - 2:4.7.2-3
 - Rebuild for following CVEs:
-  CVE-2023-39318 CVE-2023-39319 CVE-2023-39321 CVE-2023-39322 CVE-2023-29409
+  CVE-2023-39318 CVE-2023-39319 CVE-2023-39321 CVE-2023-39322
 - Related: Jira:RHEL-2785
-- Related: Jira:RHEL-7452
+
+* Fri Nov 10 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.7.2-2
+- update to latest content of https://github.com/containers/podman/releases/tag/4.7.2
+  (https://github.com/containers/podman/commit/750b4c3a7c31f6573350f0b3f1b787f26e0fe1e3)
+- Related: Jira:RHEL-2112
+
+* Fri Nov 10 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.7.2-1
+- update to https://github.com/containers/podman/releases/tag/v4.7.2
+- remove gvisor from podman and depend on external one
+- Related: Jira:RHEL-2112
 
 * Fri Sep 29 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-6
 - update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
   (https://github.com/containers/podman/commit/68e7ae0)
-- Related: Jira:RHEL-2785
-- Related: Jira:RHEL-7452
+- Related: Jira:RHEL-2112
 
 * Fri Aug 25 2023 Jindrich Novy <jnovy@redhat.com> - 2:4.6.1-5
 - update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
