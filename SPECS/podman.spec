@@ -7,12 +7,11 @@
 GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -linkmode=external -compressdwarf=false -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags'" -a -v %{?**};
 
 %global import_path github.com/containers/podman
-%global branch v4.6.1-rhel
-%global commit0 22c230846c6a5a48968b1880398e99892b060cc3
+%global branch v4.9
+%global commit0 4b69d939e692aeab7f10d3757458e3c201da8fbb
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
-#%%global dnsnamever 1.3.0
-%global commit_dnsname 18822f9a4fb35d1349eb256f4cd2bfd372474d84
+%global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
 %global shortcommit_dnsname %(c=%{commit_dnsname}; echo ${c:0:7})
 %global gvproxyrepo gvisor-tap-vsock
 %global gvproxyver 0.7.1
@@ -20,8 +19,8 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 Epoch: 3
 Name: podman
-Version: 4.6.1
-Release: 9%{?dist}
+Version: 4.9.4
+Release: 0.1%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -39,7 +38,7 @@ ExclusiveArch: %{go_arches}
 Provides: %{name}-manpages = %{epoch}:%{version}-%{release}
 Obsoletes: %{name}-manpages < %{epoch}:%{version}-%{release}
 BuildRequires: %{_bindir}/envsubst
-BuildRequires: golang >= 1.20.6
+BuildRequires: golang >= 1.17.7
 BuildRequires: glib2-devel
 BuildRequires: glibc-devel
 BuildRequires: glibc-static
@@ -423,27 +422,45 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
-* Wed Apr 17 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.6.1-9
+* Tue Feb 20 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.9.4-0.1
+- update to the latest content of https://github.com/containers/podman/tree/v4.9
+  (https://github.com/containers/podman/commit/4b69d93)
+- Related: Jira:RHEL-2110
+
+* Tue Feb 06 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.9.2-1
+- update to the latest content of https://github.com/containers/podman/tree/v4.9
+  (https://github.com/containers/podman/commit/4c14019)
+- Related: Jira:RHEL-2110
+
+* Fri Feb 02 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.9.1-1
+- switch to v4.9.1-rhel branch
+- update dnsname to the latest commit
+- Related: Jira:RHEL-2110
+
+* Tue Jan 23 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.9.0-1
+- update to https://github.com/containers/podman/releases/tag/v4.9.0
+- Related: Jira:RHEL-2110
+
+* Fri Jan 05 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.8.3-1
+- update to https://github.com/containers/podman/releases/tag/v4.8.3
+- Related: Jira:RHEL-2110
+
+* Tue Jan 02 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.8.2-1
+- update to https://github.com/containers/podman/releases/tag/v4.8.2
+- Related: Jira:RHEL-2110
+
+* Thu Dec 07 2023 Lokesh Mandvekar <lsm5@redhat.com> - 3:4.8.1-1
+- update to https://github.com/containers/podman/releases/tag/v4.8.1
+- Related: Jira:RHEL-2110
+
+* Fri Nov 10 2023 Jindrich Novy <jnovy@redhat.com> - 3:4.7.2-1
+- update to https://github.com/containers/podman/releases/tag/v4.7.2
+- Related: Jira:RHEL-2110
+
+* Fri Sep 29 2023 Jindrich Novy <jnovy@redhat.com> - 3:4.6.1-5
 - update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
-  (https://github.com/containers/podman/commit/22c2308)
-- Resolves: RHEL-26763
-
-* Tue Jan 23 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.6.1-8
-- Make the module buildable again
-- Resolves: RHEL-16299
-
-* Fri Jan 19 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.6.1-7
-- update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
-  (https://github.com/containers/podman/commit/227b84e)
-- Resolves: RHEL-20910
-
-* Thu Jan 18 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.6.1-6
-- Update gvproxy to be rebuildable with newer versions of golang
-- Related: RHEL-19138
-
-* Mon Dec 04 2023 Lokesh Mandvekar <lsm5@redhat.com> - 3:4.6.1-5
-- Rebuild with golang 1.20.10 for CVE-2023-39321
-- Related: Jira:RHEL-4515
+  (https://github.com/containers/podman/commit/68e7ae0)
+- Related: Jira:RHEL-2110
 
 * Fri Aug 25 2023 Jindrich Novy <jnovy@redhat.com> - 3:4.6.1-4
 - update to the latest content of https://github.com/containers/podman/tree/v4.6.1-rhel
