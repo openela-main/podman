@@ -7,8 +7,8 @@
 GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -linkmode=external -compressdwarf=false -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags'" -a -v %{?**};
 
 %global import_path github.com/containers/podman
-%global branch v4.9
-%global commit0 4b69d939e692aeab7f10d3757458e3c201da8fbb
+%global branch v4.9-rhel
+%global commit0 7752c56006f06fc608bf40a12ceb564ab6b045c9
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -17,10 +17,10 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 %global gvproxyver 0.7.1
 %global commit_gvproxy 97028a6a6d6af2f26680f4fdf9dd15323de07804
 
-Epoch: 3
+Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 0.1%{?dist}
+Release: 1%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -422,6 +422,21 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Mon Apr 01 2024 Lokesh Mandvekar <lsm5@redhat.com> - 4:4.9.4-1
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/7752c56)
+- Resolves: RHEL-28225
+
+* Tue Mar 19 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.3-2
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/5f872ae)
+- Resolves: RHEL-28225
+
+* Wed Mar 13 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.9.3-1
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/06e4598)
+- Resolves: RHEL-28632 RHEL-28628 RHEL-28803
+
 * Tue Feb 20 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.9.4-0.1
 - update to the latest content of https://github.com/containers/podman/tree/v4.9
   (https://github.com/containers/podman/commit/4b69d93)
