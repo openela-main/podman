@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -358,6 +358,10 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Fri Jun 21 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-5
+- rebuild for CVE-2024-1394
+- Resolves: RHEL-40793
+
 * Tue Apr 30 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-4
 - update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
   (https://github.com/containers/podman/commit/4afc71a)
