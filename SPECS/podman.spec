@@ -8,19 +8,19 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.9-rhel
-%global commit0 1a6dca22bed80d4abcedd6d1cb4f8f636c7a42ff
+%global commit0 6b45bb172a71e5af9d3da83dec9ed518538499a4
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
 %global shortcommit_dnsname %(c=%{commit_dnsname}; echo ${c:0:7})
 %global gvproxyrepo gvisor-tap-vsock
-%global gvproxyver 0.7.1
-%global commit_gvproxy 97028a6a6d6af2f26680f4fdf9dd15323de07804
+%global gvproxyver 0.7.3
+%global commit_gvproxy c62637db4d1417408b84340cbe993843a4984b92
 
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 4%{?dist}
+Release: 12%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -423,6 +423,42 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Thu Aug 08 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-12
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/6b45bb1)
+- Resolves: RHEL-53249
+
+* Mon Aug 05 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-11
+- rebuild for  golang fixes
+- Related: RHEL-28452
+
+* Thu Aug 01 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-10
+- rebuild for  golang fixes
+- Related: RHEL-28452
+
+* Tue Jul 23 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-9
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/1a2d8e3)
+- Resolves: RHEL-32589
+
+* Mon Jul 22 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-8
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/affa589)
+- Resolves: RHEL-47169
+
+* Thu Jul 18 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-7
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/8fa0c76)
+- Resolves: RHEL-40800
+
+* Wed Jul 17 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-6
+- update gvisor-tap-vsock to mekr it compilable with new golang
+- Related: RHEL-24295
+
+* Fri Jun 21 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-5
+- rebuild for CVE-2024-1394
+- Resolves: RHEL-24295
+
 * Thu Jun 13 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-4
 - update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
   (https://github.com/containers/podman/commit/1a6dca2)
