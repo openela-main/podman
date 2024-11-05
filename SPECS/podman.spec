@@ -8,7 +8,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.9-rhel
-%global commit0 e3221b581951ce34597acae75589847725eea1ef
+%global commit0 235a22c7be44bf57fc3d06b568fec363c8e05c17
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -20,7 +20,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 13%{?dist}
+Release: 15%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -423,6 +423,16 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Wed Oct 23 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-15
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/235a22c)
+- Resolves: RHEL-61837
+
+* Tue Oct 08 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-14
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/6cf9920)
+- Resolves: RHEL-60962
+
 * Wed Aug 28 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-13
 - update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
   (https://github.com/containers/podman/commit/e3221b5)
