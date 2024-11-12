@@ -4,8 +4,8 @@
 GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -linkmode=external -compressdwarf=false -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags'" -a -v %{?**};
 
 %global import_path github.com/containers/podman
-%global branch v4.9-rhel
-%global commit0 70e4d02dbd57bf7980a33e722d868dc1c6bcbb72
+%global branch v5.2-rhel
+%global commit0 6df7dfbba58e97311df61beb13823a1169860fcb
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -13,8 +13,8 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 Epoch: 4
 Name: podman
-Version: 4.9.4
-Release: 16%{?dist}
+Version: 5.2.2
+Release: 9%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -65,6 +65,7 @@ Requires: libseccomp >= 2.5
 Requires: conmon >= 2.0.25
 Requires: (container-selinux if selinux-policy)
 Requires: slirp4netns >= 0.4.0-1
+Requires: passt
 Recommends: crun
 Requires: fuse-overlayfs
 Requires: oci-runtime
@@ -156,6 +157,11 @@ sed -i '$d' configure.ac
 popd
 tar fx %{SOURCE2}
 
+# cgroups-v1 is supported on rhel9
+%if 0%{?rhel} == 9
+sed -i '/DELETE ON RHEL9/,/DELETE ON RHEL9/d' libpod/runtime.go
+%endif
+
 # this is shipped by skopeo: containers-common subpackage
 rm -rf docs/source/markdown/containers-mounts.conf.5.md
 
@@ -203,7 +209,7 @@ LDFLAGS="-X %{import_path}/libpod/define.buildInfo=$(date +%s)"
 # build rootlessport
 %gobuild -o bin/rootlessport %{import_path}/cmd/rootlessport
 
-export BUILDTAGS="seccomp btrfs_noversion exclude_graphdriver_devicemapper exclude_graphdriver_btrfs $(hack/libdm_tag.sh) $(hack/selinux_tag.sh) $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh)"
+export BUILDTAGS="cni seccomp btrfs_noversion exclude_graphdriver_devicemapper exclude_graphdriver_btrfs $(hack/libdm_tag.sh) $(hack/selinux_tag.sh) $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh)"
 %gobuild -o bin/%{name} %{import_path}/cmd/%{name}
 
 # build %%{name}-remote
@@ -333,6 +339,7 @@ fi
 %files docker
 %{_bindir}/docker
 %{_mandir}/man1/docker*.1*
+%{_sysconfdir}/profile.d/%{name}-docker.*
 %{_tmpfilesdir}/%{name}-docker.conf
 %{_user_tmpfilesdir}/%{name}-docker.conf
 
@@ -358,101 +365,103 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
-* Fri Nov 01 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-16
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/70e4d02)
-- Resolves: RHEL-65451
+* Wed Oct 23 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-9
+- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
+  (https://github.com/containers/podman/commit/6df7dfb)
+- Resolves: RHEL-61847
 
-* Tue Oct 29 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-15
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/1866072)
-- Resolves: RHEL-61868
+* Tue Oct 15 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-8
+- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
+  (https://github.com/containers/podman/commit/c03b5f3)
+- Resolves: RHEL-61667
 
-* Thu Oct 24 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-14
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/235a22c)
-- Resolves: RHEL-61154
+* Mon Oct 07 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-7
+- attempt to fix the TMT testing pipeline
+- Resolves: RHEL-59714
 
-* Fri Oct 11 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-13
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/6cf9920)
-- Resolves: RHEL-60964
+* Mon Oct 07 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-6
+- podman gating: test CNI, thanks to Ed Santiago
+- Resolves: RHEL-61249
 
-* Tue Oct 08 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-12
-- rebuild to address CVE-2024-34155 CVE-2024-34156 CVE-2024-34158
-- Resolves: RHEL-57980 RHEL-57950 RHEL-58203
+* Mon Oct 07 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-5
+- bump Epoch to 4
+- Resolves: RHEL-60963
 
-* Thu Aug 29 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-11
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/e3221b5)
-- Resolves: RHEL-56327 RHEL-50231
+* Mon Oct 07 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.2-4
+- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
+  (https://github.com/containers/podman/commit/8e693ce)
+- Resolves: RHEL-60963
 
-* Thu Aug 08 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-10
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/6b45bb1)
-- Resolves: RHEL-53250
+* Wed Sep 25 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.2-3
+- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
+  (https://github.com/containers/podman/commit/5f2c188)
+- Resolves: RHEL-59703
 
-* Thu Jul 25 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-9
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/1a2d8e3)
-- Resolves: RHEL-50507
+* Tue Sep 24 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.2-2
+- Add cni build tag to podman build
+- Resolves: RHEL-59714
 
-* Mon Jul 22 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-8
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/affa589)
-- Resolves: RHEL-45916
+* Thu Aug 22 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.2-1
+- update to https://github.com/containers/podman/releases/tag/v5.2.2
+- Related: RHEL-27608
 
-* Thu Jul 18 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-7
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/8fa0c76)
-- Resolves: RHEL-40804
+* Thu Aug 15 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.1-1
+- update to https://github.com/containers/podman/releases/tag/v5.2.1
+- Related: RHEL-27608
 
-* Mon Jul 01 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-6
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/b699052)
-- Resolves: RHEL-45531
+* Wed Aug 07 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.0-2
+- Add PODMAN_TESTING definition
+- Related: RHEL-27608
 
-* Fri Jun 21 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-5
-- rebuild for CVE-2024-1394
-- Resolves: RHEL-40793
+* Mon Aug 05 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.0-1
+- update to https://github.com/containers/podman/releases/tag/v5.2.0
+- Related: RHEL-27608
 
-* Tue Apr 30 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-4
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/4afc71a)
-- Resolves: RHEL-28735
+* Wed Jul 10 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.1.2-1
+- update to https://github.com/containers/podman/releases/tag/v5.1.2
+- Related: RHEL-27608
 
-* Mon Apr 15 2024 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-3
-- rebuild
-- Related: RHEL-28234
+* Tue Jun 11 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.1.1-1
+- update to https://github.com/containers/podman/releases/tag/v5.1.1
+- Related: RHEL-27608
 
-* Wed Apr 03 2024 Lokesh Mandvekar <lsm5@redhat.com> - 4:4.9.4-2
-- bump Epoch to 4 to preserve upgrade path from rhel 8.10
-- bump release tag or else it refuses to build
-- Resolves: RHEL-28234
+* Mon Jun 03 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.1.0-1
+- update to https://github.com/containers/podman/releases/tag/v5.1.0
+- Related: RHEL-27608
 
-* Wed Apr 03 2024 Lokesh Mandvekar <lsm5@redhat.com> - 4:4.9.4-1
-- bump Epoch to 4 to preserve upgrade path from rhel 8.10
-- Resolves: RHEL-28234
+* Wed May 29 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.0.3-1
+- update to https://github.com/containers/podman/releases/tag/v5.0.3
+- Related: RHEL-27608
 
-* Mon Apr 01 2024 Lokesh Mandvekar <lsm5@redhat.com> - 3:4.9.4-1
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/7752c56)
-- Resolves: RHEL-28234
+* Tue May 07 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.0.2-1
+- update to https://github.com/containers/podman/releases/tag/v5.0.2
+- Related: RHEL-27608
 
-* Tue Mar 19 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.9.3-3
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/5f872ae)
-- Resolves: RHEL-28234
+* Mon Apr 15 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.0.1-2
+- Add requires to passt
+- Related: RHEL-27608
 
-* Thu Mar 14 2024 Jindrich Novy <jnovy@redhat.com> - 3:4.9.3-2
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/06e4598)
-- Resolves: RHEL-28636
+* Sat Apr 13 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.0.1-1
+- update to https://github.com/containers/podman/releases/tag/v5.0.1
+- Related: RHEL-27608
 
-* Fri Mar 08 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.9.3-1
-- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
-  (https://github.com/containers/podman/commit/c82fdc8)
-- Resolves: RHEL-28633 RHEL-28629
+* Fri Mar 22 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.0.0-3
+- Add missing scripts
+- Related: RHEL-27608
+
+* Fri Mar 22 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.0.0-2
+- update to latest content of https://github.com/containers/podman/releases/tag/5.0.0
+  (https://github.com/containers/podman/commit/e71ec6f1d94d2d97fb3afe08aae0d8adaf8bddf0)
+- Related: RHEL-27608
+
+* Wed Mar 20 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.0.0-1
+- update to https://github.com/containers/podman/releases/tag/v5.0.0
+- Related: RHEL-27608
+
+* Tue Mar 19 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.9.4-0.2
+- update to the latest content of https://github.com/containers/podman/tree/v4.9
+  (https://github.com/containers/podman/commit/3ae0197)
+- Related: RHEL-27608
 
 * Tue Feb 20 2024 Jindrich Novy <jnovy@redhat.com> - 2:4.9.4-0.1
 - update to the latest content of https://github.com/containers/podman/tree/v4.9
