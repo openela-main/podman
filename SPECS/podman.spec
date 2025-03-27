@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v5.2-rhel
-%global commit0 173b20bfee64e72e5a74347facf694b3e4fe26d8
+%global commit0 a2d774cd664402a14755b4b270fb4cc8dd99acbc
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 5.2.2
-Release: 13%{?dist}
+Release: 15%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -365,6 +365,18 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Mon Mar 17 2025 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-15
+- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
+  (https://github.com/containers/podman/commit/a2d774c)
+- fixes "Excessive memory leak due to uncontrolled accumulation of health.log entries in Podman 5.x - [RHEL 9.5] Zstream"
+- Resolves: RHEL-83558
+
+* Mon Mar 17 2025 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-14
+- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
+  (https://github.com/containers/podman/commit/ea1bef4)
+- fixes "CVE-2025-22869 podman: Potential denial of service in golang.org/x/crypto [rhel-9.5.z]"
+- Resolves: RHEL-81318
+
 * Fri Jan 24 2025 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-13
 - update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
   (https://github.com/containers/podman/commit/173b20b)
