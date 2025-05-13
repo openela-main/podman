@@ -4,8 +4,8 @@
 GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -linkmode=external -compressdwarf=false -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags'" -a -v %{?**};
 
 %global import_path github.com/containers/podman
-#%%global branch v5.4-rhel
-%global commit0 f9f7d48b24b1ca4403f189caaeab1cb8ff4a9aa2
+%global branch v5.4-rhel
+%global commit0 0ee1d4919a9686efb3b09842c8d960c1a5ecb2f1
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 5
 Name: podman
 Version: 5.4.0
-Release: 1%{?dist}
+Release: 9%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -370,6 +370,51 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Wed Apr 09 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-9
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/0ee1d49)
+- fixes "Rootless container libpod/tmp/persist directories not cleaned up, fill up tmpfs - [RHEL 9.6] 0day"
+- Resolves: RHEL-86544
+
+* Mon Apr 07 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-8
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/a994a04)
+- fixes "podman tests are failing - [RHEL 9.6] 0day"
+- Resolves: RHEL-86092
+
+* Mon Mar 31 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-7
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/f7bf65c)
+- fixes "Importing a tar.xz archive as a container fails with error 'layer 0 <...> does not match config's DiffID'  - [RHEL 9.6] 0day"
+- Resolves: RHEL-85218
+
+* Tue Mar 18 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-6
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/9ad4842)
+- fixes "CVE-2025-22869 podman: Potential denial of service in golang.org/x/crypto [rhel-9.6]"
+- Resolves: RHEL-81319
+
+* Fri Mar 14 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-5
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/9d2e54f)
+- fixes "Excessive memory leak due to uncontrolled accumulation of health.log entries in Podman 5.x - [RHEL - 9.6] ZeroDay"
+- Resolves: RHEL-83557
+
+* Wed Mar 12 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-4
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/45c2d1f)
+- Resolves: RHEL-82970
+
+* Tue Mar 11 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-3
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/e48006b)
+- Resolves: RHEL-82198
+
+* Thu Mar 06 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-2
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/2adbe89)
+- Resolves: RHEL-79694
+
 * Wed Feb 12 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-1
 - update to https://github.com/containers/podman/releases/tag/v5.4.0
 - Related: RHEL-60277
