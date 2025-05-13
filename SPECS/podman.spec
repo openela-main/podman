@@ -4,17 +4,17 @@
 GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -linkmode=external -compressdwarf=false -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags'" -a -v %{?**};
 
 %global import_path github.com/containers/podman
-%global branch v5.2-rhel
-%global commit0 da46fda57790724a606a21e0dbb1e1e2eeab2400
+#%%global branch v5.4-rhel
+%global commit0 f9f7d48b24b1ca4403f189caaeab1cb8ff4a9aa2
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
 %global shortcommit_dnsname %(c=%{commit_dnsname}; echo ${c:0:7})
 
-Epoch: 4
+Epoch: 5
 Name: podman
-Version: 5.2.2
-Release: 16%{?dist}
+Version: 5.4.0
+Release: 1%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -212,6 +212,9 @@ LDFLAGS="-X %{import_path}/libpod/define.buildInfo=$(date +%s)"
 export BUILDTAGS="cni seccomp btrfs_noversion exclude_graphdriver_devicemapper exclude_graphdriver_btrfs $(hack/libdm_tag.sh) $(hack/selinux_tag.sh) $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh)"
 %gobuild -o bin/%{name} %{import_path}/cmd/%{name}
 
+# build %%{name}-testing
+%gobuild -o bin/podman-testing %{import_path}/cmd/podman-testing
+
 # build %%{name}-remote
 export BUILDTAGS="remote $BUILDTAGS"
 %gobuild -o bin/%{name}-remote %{import_path}/cmd/%{name}
@@ -243,7 +246,8 @@ PODMAN_VERSION=%{version} %{__make} PREFIX=%{buildroot}%{_prefix} ETCDIR=%{build
         install.systemd \
         install.completions \
         install.docker \
-        install.docker-docs
+        install.docker-docs \
+        install.testing
 
 sed -i 's;%{buildroot};;g' %{buildroot}%{_bindir}/docker
 
@@ -257,7 +261,7 @@ cp -pav test/system %{buildroot}/%{_datadir}/%{name}/test/
 rm -f               %{buildroot}/%{_datadir}/%{name}/test/system/*.t
 
 # do not include docker and podman-remote man pages in main package
-for file in `find %{buildroot}%{_mandir}/man[15] -type f | sed "s,%{buildroot},," | grep -v -e remote -e docker`; do
+for file in `find %{buildroot}%{_mandir}/man[157] -type f | sed "s,%{buildroot},," | grep -v -e remote -e docker`; do
     echo "$file*" >> podman.file-list
 done
 
@@ -362,82 +366,60 @@ fi
 
 %files tests
 %license LICENSE
+%{_bindir}/%{name}-testing
 %{_datadir}/%{name}/test
 
 %changelog
-* Fri Apr 11 2025 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-16
-- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
-  (https://github.com/containers/podman/commit/da46fda)
-- fixes "Rootless container libpod/tmp/persist directories not cleaned up, fill up tmpfs - [RHEL 9.5]"
-- Resolves: RHEL-86866
+* Wed Feb 12 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-1
+- update to https://github.com/containers/podman/releases/tag/v5.4.0
+- Related: RHEL-60277
 
-* Mon Mar 17 2025 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-15
-- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
-  (https://github.com/containers/podman/commit/a2d774c)
-- fixes "Excessive memory leak due to uncontrolled accumulation of health.log entries in Podman 5.x - [RHEL 9.5] Zstream"
-- Resolves: RHEL-83558
+* Tue Feb 04 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.3.2-2
+- Add cni to BUILDTAGS
+- Related: RHEL-60277
 
-* Mon Mar 17 2025 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-14
-- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
-  (https://github.com/containers/podman/commit/ea1bef4)
-- fixes "CVE-2025-22869 podman: Potential denial of service in golang.org/x/crypto [rhel-9.5.z]"
-- Resolves: RHEL-81318
+* Wed Jan 22 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.3.2-1
+- update to https://github.com/containers/podman/releases/tag/v5.3.2
+- Related: RHEL-60277
 
-* Fri Jan 24 2025 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-13
-- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
-  (https://github.com/containers/podman/commit/173b20b)
-- Resolves: RHEL-67606
+* Wed Nov 27 2024 Jindrich Novy <jnovy@redhat.com> - 5:5.3.1-1
+- update to https://github.com/containers/podman/releases/tag/v5.3.1
+- Related: RHEL-60277
 
-* Mon Jan 20 2025 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-12
-- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
-  (https://github.com/containers/podman/commit/76d1690)
-- Resolves: RHEL-73592
-
-* Fri Nov 15 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-11
+* Mon Nov 11 2024 Jindrich Novy <jnovy@redhat.com> - 5:5.2.2-2
 - update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
   (https://github.com/containers/podman/commit/e40738b)
-- Resolves: RHEL-61962
+- Resolves: RHEL-61858
 
-* Wed Oct 30 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-10
+* Wed Oct 09 2024 Jindrich Novy <jnovy@redhat.com> - 5:5.2.2-1
+- stick with the v5.2-rhel branch for RHEL
 - update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
-  (https://github.com/containers/podman/commit/39171ac)
-- Resolves: RHEL-62566
+  (https://github.com/containers/podman/commit/458f9b4)
+- Resolves: RHEL-60965
 
-* Wed Oct 23 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-9
-- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
-  (https://github.com/containers/podman/commit/6df7dfb)
-- Resolves: RHEL-61847
+* Tue Oct 08 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.3-6
+- properly package podman-testing
+- Resolves: RHEL-60927
 
-* Tue Oct 15 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-8
-- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
-  (https://github.com/containers/podman/commit/c03b5f3)
-- Resolves: RHEL-61667
-
-* Mon Oct 07 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-7
-- attempt to fix the TMT testing pipeline
-- Resolves: RHEL-59714
-
-* Mon Oct 07 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-6
+* Mon Oct 07 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.3-5
 - podman gating: test CNI, thanks to Ed Santiago
-- Resolves: RHEL-61249
+- Resolves: RHEL-60277
 
-* Mon Oct 07 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.2-5
-- bump Epoch to 4
-- Resolves: RHEL-60963
+* Fri Oct 04 2024 Jindrich Novy <jnovy@redhat.com> - 4:5.2.3-4
+- bump Epoch to 4 to preserve upgrade path
+- Related: RHEL-60277
 
-* Mon Oct 07 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.2-4
-- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
-  (https://github.com/containers/podman/commit/8e693ce)
-- Resolves: RHEL-60963
+* Wed Oct 02 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.3-3
+- Enable EPEL for tests for tmt+provision-container
+- Related: RHEL-16374
 
-* Wed Sep 25 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.2-3
-- update to the latest content of https://github.com/containers/podman/tree/v5.2-rhel
-  (https://github.com/containers/podman/commit/5f2c188)
-- Resolves: RHEL-59703
+* Wed Oct 02 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.3-2
+- require tmt+provision-container instead of tmt-provision-container
+- Resolves: RHEL-16374
 
-* Tue Sep 24 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.2-2
-- Add cni build tag to podman build
-- Resolves: RHEL-59714
+* Thu Sep 26 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.3-1
+- update to https://github.com/containers/podman/releases/tag/v5.2.3
+- Related: RHEL-59620
 
 * Thu Aug 22 2024 Jindrich Novy <jnovy@redhat.com> - 2:5.2.2-1
 - update to https://github.com/containers/podman/releases/tag/v5.2.2
