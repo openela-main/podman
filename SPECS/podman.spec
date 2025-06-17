@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 5
 Name: podman
 Version: 5.4.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -370,6 +370,10 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Wed Jun 04 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-10
+- rebuild to fix CVE-2025-22871 podman: Request smuggling due to acceptance of invalid chunked data in net/http
+- Resolves: RHEL-90055
+
 * Wed Apr 09 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-9
 - update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
   (https://github.com/containers/podman/commit/0ee1d49)
