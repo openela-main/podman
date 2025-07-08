@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v5.4-rhel
-%global commit0 0ee1d4919a9686efb3b09842c8d960c1a5ecb2f1
+%global commit0 981129454d9d78920daccc7f8fcf9bf99000695e
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 5
 Name: podman
 Version: 5.4.0
-Release: 10%{?dist}
+Release: 12%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -370,6 +370,18 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Wed Jun 25 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-12
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/9811294)
+- fixes "CVE-2025-6032 podman: podman missing TLS verification [rhel-9.6.z]"
+- Resolves: RHEL-96708
+
+* Tue Jun 24 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-11
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/f944b21)
+- fixes "Terminate healthcheck command upon reaching timeout. [rhel-9.6.z]"
+- Resolves: RHEL-96917
+
 * Wed Jun 04 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-10
 - rebuild to fix CVE-2025-22871 podman: Request smuggling due to acceptance of invalid chunked data in net/http
 - Resolves: RHEL-90055
