@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v5.4-rhel
-%global commit0 981129454d9d78920daccc7f8fcf9bf99000695e
+%global commit0 b0d88c7ec22e8718084473b43357312600e5fb75
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 5
 Name: podman
 Version: 5.4.0
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -370,6 +370,12 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Wed Sep 10 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-13
+- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
+  (https://github.com/containers/podman/commit/b0d88c7)
+- fixes "CVE-2025-9566 podman: Podman kube play command may overwrite host files [rhel-9.6.z]"
+- Resolves: RHEL-113152
+
 * Wed Jun 25 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.4.0-12
 - update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
   (https://github.com/containers/podman/commit/9811294)
