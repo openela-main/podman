@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v5.6-rhel
-%global commit0 56f1962fb0af60c29c7c5d27bdb4f26b13e69afe
+%global commit0 61231e1f80413f9b0480ac38f057874be8fe52cd
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.6.0
-Release: 2%{?dist}
+Release: 6%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,6 +377,28 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Thu Oct 02 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-6
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/61231e1)
+- fixes "Timeouts while pushing Sigstore logs to Rekor - [RHEL 9.7] 0day"
+- Resolves: RHEL-111076
+
+* Tue Sep 23 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-5
+- rebuild as last build was built in the wrong tag
+- Related: RHEL-110317
+
+* Mon Sep 22 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-4
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/c5a3735)
+- fixes "Can not find network create and rm message from podman event when set --events-backend to journald - [RHEL 9.7] 0day"
+- Resolves: RHEL-110317
+
+* Wed Sep 10 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-3
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/7078b79)
+- fixes "CVE-2025-9566 podman: Podman kube play command may overwrite host files [rhel-9.7]"
+- Resolves: RHEL-113151
+
 * Fri Aug 22 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.6.0-2
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
   (https://github.com/containers/podman/commit/56f1962)
