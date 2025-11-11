@@ -8,8 +8,8 @@
 %endif
 
 %global import_path github.com/containers/podman
-%global branch v5.4-rhel
-%global commit0 b0d88c7ec22e8718084473b43357312600e5fb75
+%global branch v5.6-rhel
+%global commit0 c5a37353db1fbc118f6ba3a830cb9e865f9c1430
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -52,7 +52,7 @@ Name: podman
 %if %{defined copr_build}
 Epoch: 102
 %else
-Epoch: 6
+Epoch: 7
 %endif
 # DO NOT TOUCH the Version string!
 # The TRUE source of this specfile is:
@@ -60,14 +60,14 @@ Epoch: 6
 # If that's what you're reading, Version must be 0, and will be updated by Packit for
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
-Version: 5.4.0
+Version: 5.6.0
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 13%{?dist}
+Release: 4%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
-ExclusiveArch: aarch64 ppc64le s390x x86_64
+ExclusiveArch: aarch64 ppc64le s390x x86_64 riscv64
 %endif
 Summary: Manage Pods, Containers and Container Images
 URL: https://%{name}.io/
@@ -101,7 +101,7 @@ BuildRequires: shadow-utils-subid-devel
 BuildRequires: pkgconfig
 BuildRequires: make
 BuildRequires: man-db
-BuildRequires: ostree-devel
+BuildRequires: sqlite-devel
 BuildRequires: systemd
 BuildRequires: systemd-devel
 Requires: catatonit
@@ -149,7 +149,7 @@ pages and %{name}.
 Summary: Tests for %{name}
 
 Requires: %{name} = %{epoch}:%{version}-%{release}
-%if %{defined fedora}
+%if %{defined distro_bats}
 Requires: bats
 %endif
 Requires: attr
@@ -159,13 +159,16 @@ Requires: nmap-ncat
 Requires: httpd-tools
 Requires: openssl
 Requires: socat
+Requires: slirp4netns
 Requires: buildah
 Requires: gnupg
+Requires: xfsprogs
 
 %description tests
 %{summary}
 
-This package contains system tests for %{name}
+This package contains system tests for %{name}. Only intended to be used for
+gating tests. Not supported for end users / customers.
 
 %package remote
 Summary: (Experimental) Remote client for managing %{name} containers
@@ -230,14 +233,6 @@ sed -i 's;@@PODMAN@@\;$(BINDIR);@@PODMAN@@\;%{_bindir};' Makefile
 sed -i '/DELETE ON RHEL9/,/DELETE ON RHEL9/d' libpod/runtime.go
 %endif
 
-# These changes are only meant for copr builds
-%if %{defined copr_build}
-# podman --version should show short sha
-sed -i "s/^const RawVersion = .*/const RawVersion = \"##VERSION##-##SHORT_SHA##\"/" version/rawversion/version.go
-# use ParseTolerant to allow short sha in version
-sed -i "s/^var Version.*/var Version, err = semver.ParseTolerant(rawversion.RawVersion)/" version/version.go
-%endif
-
 %build
 %set_build_flags
 export CGO_CFLAGS=$CFLAGS
@@ -255,6 +250,7 @@ export GOPROXY=direct
 
 LDFLAGS="-X %{ld_libpod}/define.buildInfo=${SOURCE_DATE_EPOCH:-$(date +%s)} \
          -X \"%{ld_libpod}/define.buildOrigin=%{build_origin}\" \
+         -X %{ld_libpod}/define.gitCommit=%{commit0} \
          -X %{ld_libpod}/config._installPrefix=%{_prefix} \
          -X %{ld_libpod}/config._etcDir=%{_sysconfdir} \
          -X %{ld_project}/pkg/systemd/quadlet._binDir=%{_bindir}"
@@ -262,7 +258,8 @@ LDFLAGS="-X %{ld_libpod}/define.buildInfo=${SOURCE_DATE_EPOCH:-$(date +%s)} \
 # build rootlessport first
 %gobuild -o bin/rootlessport ./cmd/rootlessport
 
-export BASEBUILDTAGS="seccomp exclude_graphdriver_devicemapper $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh)"
+export BASEBUILDTAGS="seccomp $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh) libsqlite3 grpcnotrace"
+
 
 # libtrust_openssl buildtag switches to using the FIPS-compatible func
 # `ecdsa.HashSign`.
@@ -273,19 +270,19 @@ export BASEBUILDTAGS="$BASEBUILDTAGS libtrust_openssl"
 %endif
 
 # build %%{name}
-export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh) $(hack/btrfs_tag.sh) $(hack/libdm_tag.sh)"
+export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh)"
 %gobuild -o bin/%{name} ./cmd/%{name}
 
 # build %%{name}-remote
-export BUILDTAGS="$BASEBUILDTAGS exclude_graphdriver_btrfs btrfs_noversion remote"
+export BUILDTAGS="$BASEBUILDTAGS exclude_graphdriver_btrfs remote"
 %gobuild -o bin/%{name}-remote ./cmd/%{name}
 
 # build quadlet
-export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh) $(hack/btrfs_tag.sh)"
+export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh)"
 %gobuild -o bin/quadlet ./cmd/quadlet
 
 # build %%{name}-testing
-export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh) $(hack/btrfs_tag.sh)"
+export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh)"
 %gobuild -o bin/podman-testing ./cmd/podman-testing
 
 # reset LDFLAGS for plugins binaries
@@ -304,11 +301,6 @@ PODMAN_VERSION=%{version} %{__make} DESTDIR=%{buildroot} PREFIX=%{_prefix} ETCDI
        install.docker-docs \
        install.remote \
        install.testing
-
-# See above for the iptables.conf declaration
-%if %{defined fedora} && 0%{?fedora} < 41
-%{__make} DESTDIR=%{buildroot} MODULESLOADDIR=%{_modulesloaddir} install.modules-load
-%endif
 
 sed -i 's;%{buildroot};;g' %{buildroot}%{_bindir}/docker
 
@@ -390,73 +382,78 @@ ln -s ../virtiofsd %{buildroot}%{_libexecdir}/%{name}
 %endif
 
 %changelog
-* Wed Sep 10 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-13
-- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
-  (https://github.com/containers/podman/commit/b0d88c7)
-- fixes "CVE-2025-9566 podman: Podman kube play command may overwrite host files [rhel-10.0.z]"
-- Resolves: RHEL-113141
+* Mon Sep 22 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-4
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/c5a3735)
+- fixes "Can not find network create and rm message from podman event when set --events-backend to journald - [RHEL 10.1] 0day"
+- Resolves: RHEL-110318
 
-* Wed Jun 25 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-12
-- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
-  (https://github.com/containers/podman/commit/9811294)
-- fixes "CVE-2025-6032 podman: podman missing TLS verification [rhel-10.0.z]"
-- Resolves: RHEL-96698
+* Wed Sep 10 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-3
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/7078b79)
+- fixes "CVE-2025-9566 podman: Podman kube play command may overwrite host files [rhel-10.1]"
+- Resolves: RHEL-113140
 
-* Tue Jun 24 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-11
-- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
-  (https://github.com/containers/podman/commit/f944b21)
-- fixes "Terminate healthcheck command upon reaching timeout. [rhel-10.0.z]"
-- Resolves: RHEL-96916
+* Fri Aug 22 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-2
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/56f1962)
+- fixes "Work on RHEL10.1 packaging"
+- Related: RHEL-80817
 
-* Wed Jun 04 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-10
-- rebuild to fix CVE-2025-22871 podman: Request smuggling due to acceptance of invalid chunked data in net/http
-- Resolves: RHEL-90011
+* Wed Aug 20 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.1-0.1
+- update to the latest content of https://github.com/containers/podman/tree/v5.6
+  (https://github.com/containers/podman/commit/d46b857)
+- fixes "Can not find network create and rm message from podman event when set --events-backend to journald"
+- Related: RHEL-109790
 
-* Wed Apr 09 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-9
-- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
-  (https://github.com/containers/podman/commit/0ee1d49)
-- fixes "Rootless container libpod/tmp/persist directories not cleaned up, fill up tmpfs - [RHEL 10.0] 0day"
-- Resolves: RHEL-86550
+* Fri Aug 15 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-1
+- update to https://github.com/containers/podman/releases/tag/v5.6.0
+- Related: RHEL-80817
 
-* Mon Apr 07 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-8
+* Thu Jul 03 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.5.2-1
+- update to https://github.com/containers/podman/releases/tag/v5.5.2
+- Related: RHEL-80817
+
+* Tue Jun 10 2025 Lokesh Mandvekar <lsm5@redhat.com> - 6:5.5.1-2
+- Remove copr related seds from spec
+- Related: RHEL-80817
+
+* Mon Jun 09 2025 Jindrich Novy - 6:5.5.1-1
+- update to https://github.com/containers/podman/releases/tag/v5.5.1
+- Related: RHEL-80817
+
+* Fri May 02 2025 Lokesh Mandvekar <lsm5@redhat.com> - 6:5.4.0-7
+- Switch to TMT for gating tests
+- Resolves: RHEL-80817
+
+* Mon Apr 07 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-6
 - update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
   (https://github.com/containers/podman/commit/a994a04)
-- fixes "podman tests are failing - [RHEL 10.0] 0day"
-- Resolves: RHEL-86093
+- fixes "podman tests are failing"
+- Resolves: RHEL-85826
 
-* Mon Mar 31 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-7
+* Fri Apr 04 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-5
 - update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
   (https://github.com/containers/podman/commit/f7bf65c)
-- fixes "Importing a tar.xz archive as a container fails with error 'layer 0 <...> does not match config's DiffID'  - [RHEL 10.0] 0day"
-- Resolves: RHEL-85219
+- fixes "Work on RHEL10.1 packaging"
+- Related: RHEL-80817
 
-* Tue Mar 18 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-6
+* Tue Mar 18 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-4
 - update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
   (https://github.com/containers/podman/commit/9ad4842)
-- fixes "CVE-2025-22869 podman: Denial of Service in the Key Exchange of golang.org/x/crypto/ssh [rhel-10.0.z]"
-- Resolves: RHEL-82775
+- fixes "CVE-2025-22869 podman: Denial of Service in the Key Exchange of golang.org/x/crypto/ssh [rhel-10.0]"
+- Resolves: RHEL-82776
 
-* Fri Mar 14 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-5
-- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
-  (https://github.com/containers/podman/commit/9d2e54f)
-- fixes "Excessive memory leak due to uncontrolled accumulation of health.log entries in Podman 5.x - [RHEL 10.0] ZeroDay"
-- Resolves: RHEL-83556
-
-* Wed Mar 12 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-4
+* Thu Mar 13 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-3
 - update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
   (https://github.com/containers/podman/commit/45c2d1f)
-- fixes "CVE-2025-27144 podman: Go JOSE's Parsing Vulnerable to Denial of Service [rhel-10.0.z]"
-- Resolves: RHEL-82959
+- fixes "CVE-2025-27144 podman: Go JOSE's Parsing Vulnerable to Denial of Service [rhel-10.1]"
+- Resolves: RHEL-80610
 
-* Tue Mar 11 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-3
+* Fri Mar 07 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-2
 - update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
-  (https://github.com/containers/podman/commit/e48006b)
-- Resolves: RHEL-82199
-
-* Thu Mar 06 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-2
-- update to the latest content of https://github.com/containers/podman/tree/v5.4-rhel
-  (https://github.com/containers/podman/commit/2adbe89)
-- Resolves: RHEL-79695
+  (https://github.com/containers/podman/commit/5e3accd)
+- Related: RHEL-80817
 
 * Wed Feb 12 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.4.0-1
 - update to https://github.com/containers/podman/releases/tag/v5.4.0
