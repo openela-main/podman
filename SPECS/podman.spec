@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v5.6-rhel
-%global commit0 61231e1f80413f9b0480ac38f057874be8fe52cd
+%global commit0 279100774abf1292cf4f14769abd6b360a678656
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.6.0
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,6 +377,12 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Mon Nov 10 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-7
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/2791007)
+- fixes "[Minor Incident] CVE-2025-52881 podman: container escape and denial of service due to arbitrary write gadgets and procfs write redirects [rhel-9.7.z]"
+- Resolves: RHEL-126913
+
 * Thu Oct 02 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-6
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
   (https://github.com/containers/podman/commit/61231e1)
