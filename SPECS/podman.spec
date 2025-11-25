@@ -9,7 +9,7 @@
 
 %global import_path github.com/containers/podman
 %global branch v5.6-rhel
-%global commit0 c5a37353db1fbc118f6ba3a830cb9e865f9c1430
+%global commit0 279100774abf1292cf4f14769abd6b360a678656
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -63,7 +63,7 @@ Epoch: 7
 Version: 5.6.0
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 4%{?dist}
+Release: 6%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -382,6 +382,18 @@ ln -s ../virtiofsd %{buildroot}%{_libexecdir}/%{name}
 %endif
 
 %changelog
+* Mon Nov 10 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-6
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/2791007)
+- fixes "[Minor Incident] CVE-2025-52881 podman: container escape and denial of service due to arbitrary write gadgets and procfs write redirects [rhel-10.1.z]"
+- Resolves: RHEL-126635
+
+* Thu Oct 02 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-5
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/61231e1)
+- fixes "Timeouts while pushing Sigstore logs to Rekor - [RHEL 10.1] 0day"
+- Resolves: RHEL-111077
+
 * Mon Sep 22 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-4
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
   (https://github.com/containers/podman/commit/c5a3735)
