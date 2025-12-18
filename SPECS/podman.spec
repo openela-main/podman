@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v5.6-rhel
-%global commit0 279100774abf1292cf4f14769abd6b360a678656
+%global commit0 3bf531332cf3895b4a8220532c84e5849824e9e9
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.6.0
-Release: 7%{?dist}
+Release: 9%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,6 +377,16 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Wed Dec 03 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-9
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/3bf5313)
+- fixes "run 1.2.x upgrade throws error while using nocopy volume mount filesystem option - [RHEL 9.7]"
+- Resolves: RHEL-132531
+
+* Thu Nov 20 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-8
+- rebuild for golang-1.25.3
+- Resolves: RHEL-125711
+
 * Mon Nov 10 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-7
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
   (https://github.com/containers/podman/commit/2791007)
