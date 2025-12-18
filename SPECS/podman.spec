@@ -9,7 +9,7 @@
 
 %global import_path github.com/containers/podman
 %global branch v5.6-rhel
-%global commit0 279100774abf1292cf4f14769abd6b360a678656
+%global commit0 3bf531332cf3895b4a8220532c84e5849824e9e9
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -63,7 +63,7 @@ Epoch: 7
 Version: 5.6.0
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 6%{?dist}
+Release: 8%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -382,6 +382,16 @@ ln -s ../virtiofsd %{buildroot}%{_libexecdir}/%{name}
 %endif
 
 %changelog
+* Wed Dec 03 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-8
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/3bf5313)
+- fixes "run 1.2.x upgrade throws error while using nocopy volume mount filesystem option - [RHEL 10.1]"
+- Resolves: RHEL-132532
+
+* Thu Nov 20 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-7
+- rebuild for CVE-2025-58183
+- Resolves: RHEL-125640
+
 * Mon Nov 10 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-6
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
   (https://github.com/containers/podman/commit/2791007)
