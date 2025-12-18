@@ -8,7 +8,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.9-rhel
-%global commit0 ff15af15094f81011e691c0f14d7601218973c18
+%global commit0 638f1d2d83caf4c20af24ac268c82e867a47655b
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -20,7 +20,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 23%{?dist}
+Release: 25%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -423,6 +423,16 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Mon Dec 15 2025 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-25
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/638f1d2)
+- fixes "[Minor Incident] CVE-2025-52881 container-tools:rhel8/podman: container escape and denial of service due to arbitrary write gadgets and procfs write redirects [rhel-8.10.z]"
+- Resolves: RHEL-126904
+
+* Wed Dec 03 2025 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-24
+- rebuild for CVE-2025-58183
+- Resolves: RHEL-125654
+
 * Thu Sep 11 2025 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-23
 - update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
   (https://github.com/containers/podman/commit/ff15af1)
