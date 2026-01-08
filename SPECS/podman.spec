@@ -8,7 +8,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.9-rhel
-%global commit0 638f1d2d83caf4c20af24ac268c82e867a47655b
+%global commit0 837a65cc5e4c200918e8c316ff0afcf3058e8890
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -20,7 +20,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 25%{?dist}
+Release: 26%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -423,6 +423,12 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Fri Dec 19 2025 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-26
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/837a65c)
+- fixes "do not pass volume options as bind mounts options to runtime"
+- Resolves: RHEL-132859
+
 * Mon Dec 15 2025 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-25
 - update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
   (https://github.com/containers/podman/commit/638f1d2)
