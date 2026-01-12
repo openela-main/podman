@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v5.6-rhel
-%global commit0 3bf531332cf3895b4a8220532c84e5849824e9e9
+%global commit0 0a20b845f696a6c588277a8605220b0a15fce179
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.6.0
-Release: 9%{?dist}
+Release: 11%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,6 +377,18 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Thu Jan 08 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-11
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/0a20b84)
+- fixes "CVE-2025-47913 podman: golang.org/x/crypto/ssh/agent: SSH client panic due to unexpected SSH_AGENT_SUCCESS [rhel-9.7.z]"
+- Resolves: RHEL-134793
+
+* Mon Dec 15 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-10
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/a58af02)
+- fixes "[podman 5.6][runc 1.3.3] podman update can not update the io related options with runc"
+- Resolves: RHEL-81042
+
 * Wed Dec 03 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-9
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
   (https://github.com/containers/podman/commit/3bf5313)
