@@ -9,7 +9,7 @@
 
 %global import_path github.com/containers/podman
 %global branch v5.6-rhel
-%global commit0 3bf531332cf3895b4a8220532c84e5849824e9e9
+%global commit0 b194cd996eb74ecf0ff67d710d4b2aaa90e1c27e
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -63,7 +63,7 @@ Epoch: 7
 Version: 5.6.0
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 8%{?dist}
+Release: 11%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -382,6 +382,24 @@ ln -s ../virtiofsd %{buildroot}%{_libexecdir}/%{name}
 %endif
 
 %changelog
+* Mon Jan 12 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-11
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/b194cd9)
+- fixes "podman build system test easily failed with TIMEOUT"
+- Resolves: RHEL-138650
+
+* Thu Jan 08 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-10
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/0a20b84)
+- fixes "CVE-2025-47913 podman: golang.org/x/crypto/ssh/agent: SSH client panic due to unexpected SSH_AGENT_SUCCESS [rhel-10.1.z]"
+- Resolves: RHEL-134778
+
+* Mon Dec 15 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-9
+- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
+  (https://github.com/containers/podman/commit/a58af02)
+- fixes "Bump to runc v1.2.9 or v1.3.4 to get CVE and regression fixes - Podman [rhel-10.1.z]"
+- Resolves: RHEL-132825
+
 * Wed Dec 03 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-8
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
   (https://github.com/containers/podman/commit/3bf5313)
