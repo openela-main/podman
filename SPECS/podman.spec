@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.6.0
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,6 +377,10 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Fri Feb 20 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-14
+- Rebuild for new golang to address CVE-2025-61726
+- Resolves: RHEL-146869
+
 * Tue Jan 27 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-13
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
   (https://github.com/containers/podman/commit/1dce7a7)
