@@ -63,7 +63,7 @@ Epoch: 7
 Version: 5.6.0
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 11%{?dist}
+Release: 12%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -382,6 +382,10 @@ ln -s ../virtiofsd %{buildroot}%{_libexecdir}/%{name}
 %endif
 
 %changelog
+* Fri Feb 20 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-12
+- Rebuild for new golang to address CVE-2025-61726
+- Resolves: RHEL-146727
+
 * Mon Jan 12 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-11
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
   (https://github.com/containers/podman/commit/b194cd9)
