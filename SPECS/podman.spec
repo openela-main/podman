@@ -8,7 +8,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.9-rhel
-%global commit0 702415d8fcdb82cb405ffff57b7b937988582ef1
+%global commit0 79517c7797f5b47d20104ea0b5ce4e16559ce021
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -20,7 +20,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 27%{?dist}
+Release: 30%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -423,6 +423,20 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Wed Mar 11 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-30
+- update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
+  (https://github.com/containers/podman/commit/79517c7)
+- fixes "When using a volume mount that is RO in podman it throws error because runc automatically appends RW to it which throws an error [rhel-8.10.z]"
+- Resolves: RHEL-152630
+
+* Tue Feb 17 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-29
+- rebuild for CVE-2025-68121
+- Resolves: RHEL-149265
+
+* Mon Feb 02 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-28
+- rebuild
+- Resolves: RHEL-140532
+
 * Wed Jan 14 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-27
 - update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
   (https://github.com/containers/podman/commit/702415d)
