@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 #%%global branch v5.6-rhel
-%global commit0 07efc23e05c3d9aa15a0f30d57194737bfc4b6b1
+%global commit0 5b263b5f5b48004a87caac44e67349a8266d9ef4
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -13,7 +13,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 Epoch: 6
 Name: podman
-Version: 5.8.0
+Version: 5.8.2
 Release: 1%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
@@ -377,6 +377,24 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Thu Apr 16 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-1
+- update to https://github.com/containers/podman/releases/tag/v5.8.2
+- fixes CVE-2026-34986 go-jose: Go JOSE Denial of Service via crafted JWE
+- Resolves: RHEL-165040
+
+* Wed Apr 08 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.1-3
+- revert sequoia - only available in RHEL10
+- Related: RHEL-164019
+
+* Wed Apr 08 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.1-2
+- enable sequoia
+- Resolves: RHEL-164019
+
+* Mon Mar 30 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.1-1
+- update to https://github.com/containers/podman/releases/tag/v5.8.1
+- fixes podman restart policy `unless-stopped` does not behave exactly as `always` despite the man page saying they are identical - [RHEL-9.8] [0day]
+- Resolves: RHEL-157746
+
 * Thu Feb 19 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.0-1
 - update to https://github.com/containers/podman/releases/tag/v5.8.0
 - Related: RHEL-111919
