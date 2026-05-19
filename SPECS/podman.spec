@@ -7,9 +7,12 @@
 %global debug_package %{nil}
 %endif
 
+# https://issues.redhat.com/browse/RHEL-56365
+%global sequoia 1
+
 %global import_path github.com/containers/podman
-%global branch v5.6-rhel
-%global commit0 b194cd996eb74ecf0ff67d710d4b2aaa90e1c27e
+#%%global branch v5.6-rhel
+%global commit0 5b263b5f5b48004a87caac44e67349a8266d9ef4
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -60,10 +63,10 @@ Epoch: 7
 # If that's what you're reading, Version must be 0, and will be updated by Packit for
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
-Version: 5.6.0
+Version: 5.8.2
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 12%{?dist}
+Release: 1%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -114,6 +117,10 @@ Requires: containers-common-extra >= 5:0.58.0-1
 %else
 Requires: containers-common-extra
 %endif
+%if %{defined sequoia}
+Requires: podman-sequoia
+%endif
+
 Obsoletes: %{name}-quadlet <= 5:4.4.0-1
 Provides: %{name}-quadlet = %{epoch}:%{version}-%{release}
 
@@ -271,6 +278,11 @@ export BASEBUILDTAGS="$BASEBUILDTAGS libtrust_openssl"
 
 # build %%{name}
 export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh)"
+
+%if %{defined sequoia}
+export BUILDTAGS="$BUILDTAGS containers_image_sequoia"
+%endif
+
 %gobuild -o bin/%{name} ./cmd/%{name}
 
 # build %%{name}-remote
@@ -317,6 +329,9 @@ cp -pav test/system %{buildroot}%{_datadir}/%{name}/test/
 %ifarch %{machine_arches}
 # symlink virtiofsd in %%{name} libexecdir for machine subpackage
 ln -s ../virtiofsd %{buildroot}%{_libexecdir}/%{name}
+%if !%{defined qemu}
+ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
+%endif
 %endif
 
 #define license tag if not already defined
@@ -379,64 +394,33 @@ ln -s ../virtiofsd %{buildroot}%{_libexecdir}/%{name}
 %files machine
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/virtiofsd
+%if !%{defined qemu}
+%{_libexecdir}/%{name}/qemu-system-%{arch}
+%endif
 %endif
 
 %changelog
-* Fri Feb 20 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-12
-- Rebuild for new golang to address CVE-2025-61726
-- Resolves: RHEL-146727
+* Thu Apr 16 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-1
+- update to https://github.com/containers/podman/releases/tag/v5.8.2
+- fixes CVE-2026-34986 go-jose: Go JOSE Denial of Service via crafted JWE
+- Resolves: RHEL-165012
 
-* Mon Jan 12 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-11
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/b194cd9)
-- fixes "podman build system test easily failed with TIMEOUT"
-- Resolves: RHEL-138650
+* Mon Mar 30 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.1-1
+- update to https://github.com/containers/podman/releases/tag/v5.8.1
+- fixes Update Podman to support TLS 1.3 configuration
+- Resolves: RHEL-153732
 
-* Thu Jan 08 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-10
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/0a20b84)
-- fixes "CVE-2025-47913 podman: golang.org/x/crypto/ssh/agent: SSH client panic due to unexpected SSH_AGENT_SUCCESS [rhel-10.1.z]"
-- Resolves: RHEL-134778
+* Mon Feb 16 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.0-2
+- enable sequoia
+- Resolves: RHEL-56365
 
-* Mon Dec 15 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-9
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/a58af02)
-- fixes "Bump to runc v1.2.9 or v1.3.4 to get CVE and regression fixes - Podman [rhel-10.1.z]"
-- Resolves: RHEL-132825
+* Fri Feb 13 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.0-1
+- update to https://github.com/containers/podman/releases/tag/v5.8.0
+- Related: RHEL-122178
 
-* Wed Dec 03 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-8
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/3bf5313)
-- fixes "run 1.2.x upgrade throws error while using nocopy volume mount filesystem option - [RHEL 10.1]"
-- Resolves: RHEL-132532
-
-* Thu Nov 20 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-7
-- rebuild for CVE-2025-58183
-- Resolves: RHEL-125640
-
-* Mon Nov 10 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-6
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/2791007)
-- fixes "[Minor Incident] CVE-2025-52881 podman: container escape and denial of service due to arbitrary write gadgets and procfs write redirects [rhel-10.1.z]"
-- Resolves: RHEL-126635
-
-* Thu Oct 02 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-5
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/61231e1)
-- fixes "Timeouts while pushing Sigstore logs to Rekor - [RHEL 10.1] 0day"
-- Resolves: RHEL-111077
-
-* Mon Sep 22 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-4
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/c5a3735)
-- fixes "Can not find network create and rm message from podman event when set --events-backend to journald - [RHEL 10.1] 0day"
-- Resolves: RHEL-110318
-
-* Wed Sep 10 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-3
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/7078b79)
-- fixes "CVE-2025-9566 podman: Podman kube play command may overwrite host files [rhel-10.1]"
-- Resolves: RHEL-113140
+* Thu Jan 29 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-30
+- update to rhel-10.1.z version of podman
+- Related: RHEL-111917
 
 * Fri Aug 22 2025 Jindrich Novy <jnovy@redhat.com> - 7:5.6.0-2
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
