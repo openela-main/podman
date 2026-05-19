@@ -4,8 +4,8 @@
 GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -linkmode=external -compressdwarf=false -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags'" -a -v %{?**};
 
 %global import_path github.com/containers/podman
-%global branch v5.6-rhel
-%global commit0 1dce7a7dafba1fba1ade5f9b346b5a33430bb2a4
+#%%global branch v5.6-rhel
+%global commit0 07efc23e05c3d9aa15a0f30d57194737bfc4b6b1
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -13,8 +13,8 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 Epoch: 6
 Name: podman
-Version: 5.6.0
-Release: 14%{?dist}
+Version: 5.8.0
+Release: 1%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,71 +377,13 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
-* Fri Feb 20 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-14
-- Rebuild for new golang to address CVE-2025-61726
-- Resolves: RHEL-146869
+* Thu Feb 19 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.0-1
+- update to https://github.com/containers/podman/releases/tag/v5.8.0
+- Related: RHEL-111919
 
-* Tue Jan 27 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-13
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/1dce7a7)
-- fixes "Podman 5.6 regression: container fails to start when WORKDIR is a symlink (“file exists” error) [rhel-9.7.z]"
-- Resolves: RHEL-142311
-
-* Mon Jan 19 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-12
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/360c775)
-- fixes "[podman-5.6] Crash in podman-system-migrate due to nil c.runtime.storageService [rhel-9.7.z]"
-- Resolves: RHEL-141491
-
-* Thu Jan 08 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-11
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/0a20b84)
-- fixes "CVE-2025-47913 podman: golang.org/x/crypto/ssh/agent: SSH client panic due to unexpected SSH_AGENT_SUCCESS [rhel-9.7.z]"
-- Resolves: RHEL-134793
-
-* Mon Dec 15 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-10
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/a58af02)
-- fixes "[podman 5.6][runc 1.3.3] podman update can not update the io related options with runc"
-- Resolves: RHEL-81042
-
-* Wed Dec 03 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-9
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/3bf5313)
-- fixes "run 1.2.x upgrade throws error while using nocopy volume mount filesystem option - [RHEL 9.7]"
-- Resolves: RHEL-132531
-
-* Thu Nov 20 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-8
-- rebuild for golang-1.25.3
-- Resolves: RHEL-125711
-
-* Mon Nov 10 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-7
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/2791007)
-- fixes "[Minor Incident] CVE-2025-52881 podman: container escape and denial of service due to arbitrary write gadgets and procfs write redirects [rhel-9.7.z]"
-- Resolves: RHEL-126913
-
-* Thu Oct 02 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-6
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/61231e1)
-- fixes "Timeouts while pushing Sigstore logs to Rekor - [RHEL 9.7] 0day"
-- Resolves: RHEL-111076
-
-* Tue Sep 23 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-5
-- rebuild as last build was built in the wrong tag
-- Related: RHEL-110317
-
-* Mon Sep 22 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-4
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/c5a3735)
-- fixes "Can not find network create and rm message from podman event when set --events-backend to journald - [RHEL 9.7] 0day"
-- Resolves: RHEL-110317
-
-* Wed Sep 10 2025 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-3
-- update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
-  (https://github.com/containers/podman/commit/7078b79)
-- fixes "CVE-2025-9566 podman: Podman kube play command may overwrite host files [rhel-9.7]"
-- Resolves: RHEL-113151
+* Thu Jan 29 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.6.0-3
+- update to rhel-9.7.z version of podman
+- Resolves: RHEL-142896
 
 * Fri Aug 22 2025 Jindrich Novy <jnovy@redhat.com> - 5:5.6.0-2
 - update to the latest content of https://github.com/containers/podman/tree/v5.6-rhel
