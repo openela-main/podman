@@ -66,7 +66,7 @@ Epoch: 7
 Version: 5.8.2
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 1%{?dist}
+Release: 3%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -400,6 +400,14 @@ ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
 %endif
 
 %changelog
+* Thu May 07 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-3
+- Rebuild for CVE-2026-32283
+- Resolves: RHEL-167501
+
+* Mon May 04 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-2
+- Rebuild for CVE-2026-25679
+- Resolves: RHEL-158493
+
 * Thu Apr 16 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-1
 - update to https://github.com/containers/podman/releases/tag/v5.8.2
 - fixes CVE-2026-34986 go-jose: Go JOSE Denial of Service via crafted JWE
