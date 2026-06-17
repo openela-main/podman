@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.8.2
-Release: 1%{?dist}
+Release: 3%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,6 +377,14 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Thu May 07 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-3
+- Rebuild for CVE-2026-32283
+- Resolves: RHEL-167685
+
+* Sun May 04 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-2
+- Rebuild for CVE-2026-25679
+- Resolves: RHEL-158781
+
 * Thu Apr 16 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-1
 - update to https://github.com/containers/podman/releases/tag/v5.8.2
 - fixes CVE-2026-34986 go-jose: Go JOSE Denial of Service via crafted JWE
