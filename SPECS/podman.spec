@@ -8,7 +8,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.9-rhel
-%global commit0 11de97d6d9b6a6f3fe765f38aa08c1f97ea8d541
+%global commit0 48ede9e7c9fedb7b5809206f862251d20809888e
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -20,15 +20,11 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 31%{?dist}
+Release: 32%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
-%if 0%{?branch:1}
-Source0: https://%{import_path}/tarball/%{commit0}/%{branch}-%{shortcommit0}.tar.gz
-%else
-Source0: https://%{import_path}/archive/%{commit0}/%{name}-%{version}-%{shortcommit0}.tar.gz
-%endif
+Source0: https://gitlab.cee.redhat.com/sustaining-engineering/container-tools/src-git/%{name}/-/archive/%{commit0}/%{branch}-%{shortcommit0}.tar.gz
 Source1: https://github.com/openSUSE/catatonit/archive/v%{cataver}.tar.gz
 #Source2: https://github.com/containers/dnsname/archive/v%%{dnsnamever}.tar.gz
 Source2: https://github.com/containers/dnsname/archive/%{commit_dnsname}/dnsname-%{shortcommit_dnsname}.tar.gz
@@ -175,11 +171,7 @@ gvisor-tap-vsock brings a configurable DNS server and
 dynamic port forwarding.
 
 %prep
-%if 0%{?branch:1}
-%autosetup -Sgit -n containers-%{name}-%{shortcommit0}
-%else
 %autosetup -Sgit -n %{name}-%{commit0}
-%endif
 sed -i 's;@@PODMAN@@\;$(BINDIR);@@PODMAN@@\;%{_bindir};' Makefile
 sed -i 's,-Werror,,' pkg/rootless/rootless_linux.go
 tar fx %{SOURCE1}
@@ -423,6 +415,11 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Wed Jul 01 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-32
+- switch source URL from GitHub to the internal GitLab sustaining-engineering repo
+- update to the latest content of v4.9-rhel (commit 48ede9e)
+- bump golang.org/x/crypto to v0.53.0 to fix CVE-2026-39829, CVE-2026-39830, CVE-2026-39832, CVE-2026-42508
+
 * Tue May 19 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-31
 - update to the latest content of https://github.com/containers/podman/tree/v4.9-rhel
   (https://github.com/containers/podman/commit/11de97d)
