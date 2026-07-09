@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 #%%global branch v5.6-rhel
-%global commit0 5b263b5f5b48004a87caac44e67349a8266d9ef4
+%global commit0 a476c2b2c35443a3db1a1668ac7b402eb1eb0619
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,14 +14,14 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.8.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
 %if 0%{?branch:1}
 Source0: https://%{import_path}/tarball/%{commit0}/%{branch}-%{shortcommit0}.tar.gz
 %else
-Source0: https://%{import_path}/archive/%{commit0}/%{name}-%{version}-%{shortcommit0}.tar.gz
+Source0: https://gitlab.cee.redhat.com/sustaining-engineering/container-tools/src-git/%{name}/-/archive/%{commit0}/%{name}-%{commit0}.tar.gz
 %endif
 Source1: https://github.com/openSUSE/catatonit/archive/v%{cataver}.tar.gz
 #Source2: https://github.com/containers/dnsname/archive/v%%{dnsnamever}.tar.gz
@@ -377,6 +377,11 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Wed Jul 08 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-4
+- bump to upstream commit a476c2b2 fixing CVE-2026-39835 CVE-2026-39829
+  CVE-2026-39832 CVE-2026-42508 CVE-2026-27136 CVE-2026-25681 CVE-2026-57231 and
+  podman-remote save regression
+
 * Thu May 07 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-3
 - Rebuild for CVE-2026-32283
 - Resolves: RHEL-167685
