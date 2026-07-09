@@ -12,7 +12,7 @@
 
 %global import_path github.com/containers/podman
 #%%global branch v5.6-rhel
-%global commit0 5b263b5f5b48004a87caac44e67349a8266d9ef4
+%global commit0 a476c2b2c35443a3db1a1668ac7b402eb1eb0619
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -66,7 +66,7 @@ Epoch: 7
 Version: 5.8.2
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -78,7 +78,7 @@ URL: https://%{name}.io/
 %if 0%{?branch:1}
 Source0: https://%{import_path}/tarball/%{commit0}/%{branch}-%{shortcommit0}.tar.gz
 %else
-Source0: https://%{import_path}/archive/%{commit0}/%{name}-%{version}-%{shortcommit0}.tar.gz
+Source0: https://gitlab.cee.redhat.com/sustaining-engineering/container-tools/src-git/%{name}/-/archive/%{commit0}/%{name}-%{commit0}.tar.gz
 %endif
 
 Provides: %{name}-manpages = %{epoch}:%{version}-%{release}
@@ -400,6 +400,12 @@ ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
 %endif
 
 %changelog
+* Wed Jul 08 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-4
+- update to the latest state of the sustaining branch
+- fixes CVE-2026-42508 CVE-2026-39829 CVE-2026-39830 CVE-2026-39832 CVE-2026-39835
+- fixes CVE-2026-57231 CVE-2026-25681 CVE-2026-27136
+- Resolves: RHEL-173842 RHEL-185604 RHEL-185920 RHEL-186263 RHEL-188713 RHEL-190073 RHEL-190857 RHEL-191095 RHEL-191546 RHEL-192440
+
 * Thu May 07 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-3
 - Rebuild for CVE-2026-32283
 - Resolves: RHEL-167501
