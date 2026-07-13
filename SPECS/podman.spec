@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.8.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,6 +377,10 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Fri Jul 10 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-5
+- rebuild for CVE-2026-39822
+- Resolves: RHEL-193646
+
 * Wed Jul 08 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-4
 - bump to upstream commit a476c2b2 fixing CVE-2026-39835 CVE-2026-39829
   CVE-2026-39832 CVE-2026-42508 CVE-2026-27136 CVE-2026-25681 CVE-2026-57231 and
