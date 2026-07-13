@@ -8,7 +8,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.9-rhel
-%global commit0 48ede9e7c9fedb7b5809206f862251d20809888e
+%global commit0 bd39e824730fe1232965d89a22f50d0ac7b4061e
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -20,7 +20,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 32%{?dist}
+Release: 34%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -415,6 +415,14 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Thu Jul 09 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-34
+- upload source tarball for v4.9-rhel (commit bd39e82)
+- Resolves: RHEL-190070 RHEL-190856 RHEL-191102 RHEL-191553
+
+* Wed Jul 08 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-33
+- update to the latest content of v4.9-rhel (commit bd39e82) to fix CVE-2026-39835, CVE-2026-57231, CVE-2026-25681, CVE-2026-27136
+- Resolves: RHEL-190070 RHEL-190856 RHEL-191102 RHEL-191553
+
 * Wed Jul 01 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-32
 - switch source URL from GitHub to the internal GitLab sustaining-engineering repo
 - update to the latest content of v4.9-rhel (commit 48ede9e)
