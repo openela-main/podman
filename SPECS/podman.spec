@@ -66,7 +66,7 @@ Epoch: 7
 Version: 5.8.2
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -400,6 +400,10 @@ ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
 %endif
 
 %changelog
+* Fri Jul 10 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-5
+- rebuild for CVE-2026-39822
+- Resolves: RHEL-193642
+
 * Wed Jul 08 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-4
 - update to the latest state of the sustaining branch
 - fixes CVE-2026-42508 CVE-2026-39829 CVE-2026-39830 CVE-2026-39832 CVE-2026-39835
