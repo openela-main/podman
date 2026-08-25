@@ -8,7 +8,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.9-rhel
-%global commit0 bd39e824730fe1232965d89a22f50d0ac7b4061e
+%global commit0 5126ff2f00059db491db21cd5e7c97610096ba23
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -20,7 +20,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 34%{?dist}
+Release: 35%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -415,6 +415,10 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Thu Jul 30 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-35
+- update to the latest content of v4.9-rhel (commit 5126ff2) to fix nil pointer dereference in container commit
+- Resolves: RHEL-166084
+
 * Thu Jul 09 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-34
 - upload source tarball for v4.9-rhel (commit bd39e82)
 - Resolves: RHEL-190070 RHEL-190856 RHEL-191102 RHEL-191553
