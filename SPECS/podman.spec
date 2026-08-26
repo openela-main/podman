@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 #%%global branch v5.6-rhel
-%global commit0 a476c2b2c35443a3db1a1668ac7b402eb1eb0619
+%global commit0 e8f4170629df279bf5bb0f2b1ae702400dcc22e1
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.8.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,6 +377,9 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Sat Aug 15 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-6
+- vendor in mirror fallback for container image pulls - Resolves: RHEL-242409
+
 * Fri Jul 10 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-5
 - rebuild for CVE-2026-39822
 - Resolves: RHEL-193646
