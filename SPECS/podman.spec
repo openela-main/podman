@@ -8,7 +8,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.9-rhel
-%global commit0 5126ff2f00059db491db21cd5e7c97610096ba23
+%global commit0 74407364841798d8b5b11ff45eaf83171dbcf82c
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -20,7 +20,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 35%{?dist}
+Release: 37%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -415,13 +415,17 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
-* Thu Jul 30 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-35
-- update to the latest content of v4.9-rhel (commit 5126ff2) to fix nil pointer dereference in container commit
-- Resolves: RHEL-166084
+* Tue Sep 01 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-37
+- rebuild with updated Go to fix CVE-2026-42499
+- Resolves: RHEL-241487 RHEL-241854 RHEL-241997 RHEL-242053 RHEL-242188 RHEL-242289 RHEL-251853
 
-* Thu Jul 09 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-34
-- upload source tarball for v4.9-rhel (commit bd39e82)
-- Resolves: RHEL-190070 RHEL-190856 RHEL-191102 RHEL-191553
+* Thu Aug 20 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-36
+- rebuild with Go 1.25.11 to fix CVE-2026-33818, CVE-2026-56853, CVE-2026-56858,
+  CVE-2026-56859, CVE-2026-56860, CVE-2026-56862
+
+* Tue Jul 21 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-35
+- update to the latest content of v4.9-rhel (commit 7440736) - fix podman commit
+  nil pointer dereference when ImportBuilder fails - Resolves: RHEL-166084
 
 * Wed Jul 08 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-33
 - update to the latest content of v4.9-rhel (commit bd39e82) to fix CVE-2026-39835, CVE-2026-57231, CVE-2026-25681, CVE-2026-27136
