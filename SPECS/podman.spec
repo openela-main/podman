@@ -12,7 +12,7 @@
 
 %global import_path github.com/containers/podman
 #%%global branch v5.6-rhel
-%global commit0 a476c2b2c35443a3db1a1668ac7b402eb1eb0619
+%global commit0 2c3d2d9fab0d49701c7be383e719c36719123345
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -66,7 +66,7 @@ Epoch: 7
 Version: 5.8.2
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 5%{?dist}
+Release: 9%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -400,6 +400,22 @@ ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
 %endif
 
 %changelog
+* Mon Sep 07 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-9
+- bump golang.org/x/text to v0.39.0 to fix CVE-2026-56852 - Resolves:
+  RHEL-250818
+
+* Thu Sep 03 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-8
+- update to the latest upstream commit 66780e9b
+- Resolves: RHEL-240087
+
+* Wed Sep 02 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-7
+- Rebuild for golang CVE fixes
+- Resolves: RHEL-229846 RHEL-240087 RHEL-241164 RHEL-241603 RHEL-241741 RHEL-241990 RHEL-242165 RHEL-242240 RHEL-250818 RHEL-251815
+
+* Sat Aug 08 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-6
+- rebuild for CVE-2026-33810
+- Resolves: RHEL-229846
+
 * Fri Jul 10 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-5
 - rebuild for CVE-2026-39822
 - Resolves: RHEL-193642
