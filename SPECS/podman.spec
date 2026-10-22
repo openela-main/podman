@@ -12,7 +12,7 @@
 
 %global import_path github.com/containers/podman
 #%%global branch v5.6-rhel
-%global commit0 2c3d2d9fab0d49701c7be383e719c36719123345
+%global commit0 bd9083e037cdc4009049680e41fb36e067d51d6f
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -66,7 +66,7 @@ Epoch: 7
 Version: 5.8.2
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 9%{?dist}
+Release: 10%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -400,6 +400,9 @@ ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
 %endif
 
 %changelog
+* Mon Oct 19 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-10
+- update to the latest upstream commit bd9083e0 - Resolves: RHEL-271981
+
 * Mon Sep 07 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-9
 - bump golang.org/x/text to v0.39.0 to fix CVE-2026-56852 - Resolves:
   RHEL-250818
