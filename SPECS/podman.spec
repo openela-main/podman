@@ -20,7 +20,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 37%{?dist}
+Release: 38%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -415,6 +415,10 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Thu Oct 22 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-38
+- Rebuild for CVE-2026-78667 and CVE-2026-111943
+- Resolves: RHEL-278827 RHEL-287448
+
 * Tue Sep 01 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-37
 - rebuild with updated Go to fix CVE-2026-42499
 - Resolves: RHEL-241487 RHEL-241854 RHEL-241997 RHEL-242053 RHEL-242188 RHEL-242289 RHEL-251853
