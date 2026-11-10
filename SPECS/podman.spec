@@ -11,8 +11,8 @@
 %global sequoia 1
 
 %global import_path github.com/containers/podman
-#%%global branch v5.6-rhel
-%global commit0 aae8b83946c89bf993dc8c5e8b88590ae1fcc503
+#%%global branch v6.0-rhel
+%global commit0 cade97a52ebdf9dbf9e81de8009015776837a074
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -32,15 +32,11 @@
 %define fips_enabled 1
 %endif
 
-%global container_base_path github.com/containers
-%global container_base_url https://%{container_base_path}
+%global container_base_path go.podman.io
 
 # For LDFLAGS
-%global ld_project %{container_base_path}/%{name}/v5
+%global ld_project %{container_base_path}/%{name}/v6
 %global ld_libpod %{ld_project}/libpod
-
-# %%{name}
-%global git0 %{container_base_url}/%{name}
 
 # podman-machine subpackage will be present only on these architectures
 %global machine_arches x86_64 aarch64
@@ -63,10 +59,10 @@ Epoch: 7
 # If that's what you're reading, Version must be 0, and will be updated by Packit for
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
-Version: 5.8.2
+Version: 6.1.0
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 12%{?dist}
+Release: 2%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -75,11 +71,7 @@ ExclusiveArch: aarch64 ppc64le s390x x86_64 riscv64
 Summary: Manage Pods, Containers and Container Images
 URL: https://%{name}.io/
 # All SourceN files fetched from upstream
-%if 0%{?branch:1}
-Source0: https://%{import_path}/tarball/%{commit0}/%{branch}-%{shortcommit0}.tar.gz
-%else
-Source0: https://gitlab.cee.redhat.com/sustaining-engineering/container-tools/src-git/%{name}/-/archive/%{commit0}/%{name}-%{commit0}.tar.gz
-%endif
+Source0: https://%{import_path}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 Provides: %{name}-manpages = %{epoch}:%{version}-%{release}
 BuildRequires: %{_bindir}/envsubst
@@ -109,14 +101,8 @@ BuildRequires: systemd
 BuildRequires: systemd-devel
 Requires: catatonit
 Requires: conmon >= 2:2.1.7-2
-%if %{defined fedora} && 0%{?fedora} >= 40
-# TODO: Remove the f40 conditional after a few releases to keep conditionals to
-# a minimum
-# Ref: https://bugzilla.redhat.com/show_bug.cgi?id=2269148
-Requires: containers-common-extra >= 5:0.58.0-1
-%else
-Requires: containers-common-extra
-%endif
+# Podman 6 requires the new config file layout.
+Requires: containers-common-extra >= 5:0.68.0
 %if %{defined sequoia}
 Requires: podman-sequoia
 %endif
@@ -166,7 +152,6 @@ Requires: nmap-ncat
 Requires: httpd-tools
 Requires: openssl
 Requires: socat
-Requires: slirp4netns
 Requires: buildah
 Requires: gnupg
 Requires: xfsprogs
@@ -228,11 +213,7 @@ https://docs.podman.io/en/latest/markdown/podman-machine.1.html
 %endif
 
 %prep
-%if 0%{?branch:1}
-%autosetup -Sgit -n containers-%{name}-%{shortcommit0}
-%else
-%autosetup -Sgit -n %{name}-%{commit0}
-%endif
+%autosetup -Sgit -n %{name}-%{version}
 sed -i 's;@@PODMAN@@\;$(BINDIR);@@PODMAN@@\;%{_bindir};' Makefile
 
 # cgroups-v1 is supported on rhel9
@@ -358,12 +339,6 @@ ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
 %{_tmpfilesdir}/%{name}.conf
 %{_systemdgeneratordir}/%{name}-system-generator
 %{_systemdusergeneratordir}/%{name}-user-generator
-# iptables modules are only needed with iptables-legacy,
-# as of f41 netavark will default to nftables so do not load unessary modules
-# https://fedoraproject.org/wiki/Changes/NetavarkNftablesDefault
-%if %{defined fedora} && 0%{?fedora} < 41
-%{_modulesloaddir}/%{name}-iptables.conf
-%endif
 
 %files docker
 %{_bindir}/docker
@@ -400,60 +375,32 @@ ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
 %endif
 
 %changelog
-* Tue Oct 27 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-12
-- update to the latest upstream commit aae8b839 - fixes CVE-2025-11395
-- Resolves: RHEL-119569
+* Thu Aug 20 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.1.0-2
+- Rebuild for Go and security fixes
+- Resolves: RHEL-190079, RHEL-190852, RHEL-241124, RHEL-241361, RHEL-241463, RHEL-241829, RHEL-241930, RHEL-242162
 
-* Wed Oct 21 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-11
-- Rebuild for CVE-2026-111943
-- Resolves: RHEL-287477
+* Thu Aug 13 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.1.0-1
+- update to https://github.com/containers/podman/releases/tag/v6.1.0
+- Resolves: RHEL-185733
 
-* Mon Oct 19 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-10
-- update to the latest upstream commit bd9083e0 - Resolves: RHEL-271981
+* Wed Jul 22 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.0.2-1
+- update to the latest content of https://github.com/containers/podman/releases/tag/v6.0.2
+- Related: RHEL-185733
 
-* Mon Sep 07 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-9
-- bump golang.org/x/text to v0.39.0 to fix CVE-2026-56852 - Resolves:
-  RHEL-250818
+* Fri Jul 17 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.0.1-1
+- update to https://github.com/containers/podman/releases/tag/v6.0.1
+- Resolves: RHEL-185733
 
-* Thu Sep 03 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-8
-- update to the latest upstream commit 66780e9b
-- Resolves: RHEL-240087
+* Fri Jun 26 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.0.0-1
+- update to https://github.com/containers/podman/releases/tag/v6.0.0
+- Resolves: RHEL-185733
 
-* Wed Sep 02 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-7
-- Rebuild for golang CVE fixes
-- Resolves: RHEL-229846 RHEL-240087 RHEL-241164 RHEL-241603 RHEL-241741 RHEL-241990 RHEL-242165 RHEL-242240 RHEL-250818 RHEL-251815
-
-* Sat Aug 08 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-6
-- rebuild for CVE-2026-33810
-- Resolves: RHEL-229846
-
-* Fri Jul 10 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-5
-- rebuild for CVE-2026-39822
-- Resolves: RHEL-193642
-
-* Wed Jul 08 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-4
-- update to the latest state of the sustaining branch
-- fixes CVE-2026-42508 CVE-2026-39829 CVE-2026-39830 CVE-2026-39832 CVE-2026-39835
-- fixes CVE-2026-57231 CVE-2026-25681 CVE-2026-27136
-- Resolves: RHEL-173842 RHEL-185604 RHEL-185920 RHEL-186263 RHEL-188713 RHEL-190073 RHEL-190857 RHEL-191095 RHEL-191546 RHEL-192440
-
-* Thu May 07 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-3
-- Rebuild for CVE-2026-32283
-- Resolves: RHEL-167501
-
-* Mon May 04 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-2
-- Rebuild for CVE-2026-25679
-- Resolves: RHEL-158493
-
+* Wed Jun 17 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.3-1
+- update to https://github.com/containers/podman/releases/tag/v5.8.3
+- Resolves: RHEL-185733
 * Thu Apr 16 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.2-1
 - update to https://github.com/containers/podman/releases/tag/v5.8.2
-- fixes CVE-2026-34986 go-jose: Go JOSE Denial of Service via crafted JWE
-- Resolves: RHEL-165012
-
-* Mon Mar 30 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.1-1
-- update to https://github.com/containers/podman/releases/tag/v5.8.1
-- fixes Update Podman to support TLS 1.3 configuration
-- Resolves: RHEL-153732
+- Related: RHEL-168736
 
 * Mon Feb 16 2026 Jindrich Novy <jnovy@redhat.com> - 7:5.8.0-2
 - enable sequoia
