@@ -5,7 +5,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 #%%global branch v5.6-rhel
-%global commit0 66780e9b8968785823008e866f9bb84d20c5f691
+%global commit0 6d48b6f12f793176f3f6bc808b5a440984c14eb2
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -13,15 +13,15 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 Epoch: 6
 Name: podman
-Version: 5.8.2
-Release: 8%{?dist}
+Version: 5.8.5
+Release: 2%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
 %if 0%{?branch:1}
 Source0: https://%{import_path}/tarball/%{commit0}/%{branch}-%{shortcommit0}.tar.gz
 %else
-Source0: https://gitlab.cee.redhat.com/sustaining-engineering/container-tools/src-git/%{name}/-/archive/%{commit0}/%{name}-%{commit0}.tar.gz
+Source0: https://%{import_path}/archive/%{commit0}/%{name}-%{version}-%{shortcommit0}.tar.gz
 %endif
 Source1: https://github.com/openSUSE/catatonit/archive/v%{cataver}.tar.gz
 #Source2: https://github.com/containers/dnsname/archive/v%%{dnsnamever}.tar.gz
@@ -377,63 +377,23 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
-* Sat Oct 24 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-8
-- Rebuild for CVE-2026-78667 and CVE-2026-111943
-- Resolves: RHEL-279015
-- Resolves: RHEL-287513
+* Tue Aug 18 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.5-2
+- Rebuild for golang-1.26.6 CVE fixes (CVE-2025-68121 CVE-2026-27145
+  CVE-2026-33811 CVE-2026-33818 CVE-2026-56853 CVE-2026-56858 CVE-2026-56859
+  CVE-2026-56860 CVE-2026-56862)
+- Resolves: RHEL-164485 RHEL-173976 RHEL-186006 RHEL-190092 RHEL-190858
+  RHEL-212537 RHEL-241180 RHEL-241284 RHEL-241400 RHEL-241610 RHEL-241788
 
-* Tue Sep 15 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-7
-- update to the latest upstream commit 66780e9b
-- rebuild with golang-1.26.7 fixing CVE-2026-33818 CVE-2026-56860
-  CVE-2026-56859 CVE-2026-56858 CVE-2026-56862 CVE-2026-56853
-  CVE-2026-19730 CVE-2026-39830 CVE-2026-17106
-- Resolves: RHEL-241579
-- Resolves: RHEL-241720
-- Resolves: RHEL-241983
-- Resolves: RHEL-242126
-- Resolves: RHEL-242282
-- Resolves: RHEL-240089
-- Resolves: RHEL-186270
-- Resolves: RHEL-241172
-- Resolves: RHEL-252466
+* Mon Jul 20 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.5-1
+- update to https://github.com/containers/podman/releases/tag/v5.8.5
+- Resolves: RHEL-212537
 
-* Sat Aug 15 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-6
-- vendor in mirror fallback for container image pulls - Resolves: RHEL-242409
-
-* Fri Jul 10 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-5
-- rebuild for CVE-2026-39822
-- Resolves: RHEL-193646
-
-* Wed Jul 08 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-4
-- bump to upstream commit a476c2b2 fixing CVE-2026-39835 CVE-2026-39829
-  CVE-2026-39832 CVE-2026-42508 CVE-2026-27136 CVE-2026-25681 CVE-2026-57231 and
-  podman-remote save regression
-
-* Thu May 07 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-3
-- Rebuild for CVE-2026-32283
-- Resolves: RHEL-167685
-
-* Sun May 04 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-2
-- Rebuild for CVE-2026-25679
-- Resolves: RHEL-158781
-
+* Wed Jun 17 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.3-1
+- update to https://github.com/containers/podman/releases/tag/v5.8.3
+- Resolves: RHEL-185738
 * Thu Apr 16 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.2-1
 - update to https://github.com/containers/podman/releases/tag/v5.8.2
-- fixes CVE-2026-34986 go-jose: Go JOSE Denial of Service via crafted JWE
-- Resolves: RHEL-165040
-
-* Wed Apr 08 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.1-3
-- revert sequoia - only available in RHEL10
-- Related: RHEL-164019
-
-* Wed Apr 08 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.1-2
-- enable sequoia
-- Resolves: RHEL-164019
-
-* Mon Mar 30 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.1-1
-- update to https://github.com/containers/podman/releases/tag/v5.8.1
-- fixes podman restart policy `unless-stopped` does not behave exactly as `always` despite the man page saying they are identical - [RHEL-9.8] [0day]
-- Resolves: RHEL-157746
+- Related: RHEL-168737
 
 * Thu Feb 19 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.0-1
 - update to https://github.com/containers/podman/releases/tag/v5.8.0
