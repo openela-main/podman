@@ -12,7 +12,7 @@
 
 %global import_path github.com/containers/podman
 #%%global branch v6.0-rhel
-%global commit0 cade97a52ebdf9dbf9e81de8009015776837a074
+%global commit0 8303f2e25b675ea7f82099d615c60969aec15870
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -59,10 +59,10 @@ Epoch: 7
 # If that's what you're reading, Version must be 0, and will be updated by Packit for
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
-Version: 6.1.0
+Version: 6.1.1
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
-Release: 2%{?dist}
+Release: 1%{?dist}
 %if %{defined golang_arches_future}
 ExclusiveArch: %{golang_arches_future}
 %else
@@ -375,6 +375,14 @@ ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
 %endif
 
 %changelog
+* Wed Sep 09 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.1.1-1
+- update to https://github.com/containers/podman/releases/tag/v6.1.1
+- Resolves: RHEL-252468
+
+* Tue Sep 01 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.1.0-3
+- Rebuild for Go security fixes (Go 1.26.7)
+- Resolves: RHEL-241124 RHEL-241361 RHEL-241463 RHEL-241829 RHEL-241930 RHEL-242162
+
 * Thu Aug 20 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.1.0-2
 - Rebuild for Go and security fixes
 - Resolves: RHEL-190079, RHEL-190852, RHEL-241124, RHEL-241361, RHEL-241463, RHEL-241829, RHEL-241930, RHEL-242162
