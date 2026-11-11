@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.8.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,6 +377,10 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Tue Sep 01 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.5-3
+- Rebuild for CVE fixes in Go standard library
+- Resolves: RHEL-240088 RHEL-241284 RHEL-241400 RHEL-241610 RHEL-241788 RHEL-241921 RHEL-251888
+
 * Tue Aug 18 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.5-2
 - Rebuild for golang-1.26.6 CVE fixes (CVE-2025-68121 CVE-2026-27145
   CVE-2026-33811 CVE-2026-33818 CVE-2026-56853 CVE-2026-56858 CVE-2026-56859
