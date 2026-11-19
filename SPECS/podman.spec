@@ -12,7 +12,7 @@
 
 %global import_path github.com/containers/podman
 #%%global branch v6.0-rhel
-%global commit0 8303f2e25b675ea7f82099d615c60969aec15870
+%global commit0 464c15fec06f0074c916f9eff87c4806869c2833
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 
 %global gomodulesmode GO111MODULE=on
@@ -27,10 +27,6 @@
 %define copr_build 1
 %endif
 
-# Only RHEL and CentOS Stream rpms are built with fips-enabled go compiler
-%if %{defined rhel}
-%define fips_enabled 1
-%endif
 
 %global container_base_path go.podman.io
 
@@ -59,7 +55,7 @@ Epoch: 7
 # If that's what you're reading, Version must be 0, and will be updated by Packit for
 # copr and koji builds.
 # If you're reading this on dist-git, the version is automatically filled in by Packit.
-Version: 6.1.1
+Version: 6.1.4
 # The `AND` needs to be uppercase in the License for SPDX compatibility
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 Release: 1%{?dist}
@@ -249,13 +245,6 @@ LDFLAGS="-X %{ld_libpod}/define.buildInfo=${SOURCE_DATE_EPOCH:-$(date +%s)} \
 export BASEBUILDTAGS="seccomp $(hack/systemd_tag.sh) $(hack/libsubid_tag.sh) libsqlite3 grpcnotrace"
 
 
-# libtrust_openssl buildtag switches to using the FIPS-compatible func
-# `ecdsa.HashSign`.
-# Ref 1: https://github.com/golang-fips/go/blob/main/patches/015-add-hash-sign-verify.patch#L22
-# Ref 2: https://github.com/containers/libtrust/blob/main/ec_key_openssl.go#L23
-%if %{defined fips_enabled}
-export BASEBUILDTAGS="$BASEBUILDTAGS libtrust_openssl"
-%endif
 
 # build %%{name}
 export BUILDTAGS="$BASEBUILDTAGS $(hack/btrfs_installed_tag.sh)"
@@ -375,6 +364,14 @@ ln -s ../qemu-kvm %{buildroot}%{_libexecdir}/%{name}/qemu-system-%{arch}
 %endif
 
 %changelog
+* Thu Nov 12 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.1.4-1
+- Rebase to v6.1.4
+- Resolves: RHEL-160859
+
+* Tue Nov 03 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.1.1-2
+- Drop libtrust_openssl build tag for golang-1.27 compatibility
+- Resolves: RHEL-299623
+
 * Wed Sep 09 2026 Jindrich Novy <jnovy@redhat.com> - 7:6.1.1-1
 - update to https://github.com/containers/podman/releases/tag/v6.1.1
 - Resolves: RHEL-252468
