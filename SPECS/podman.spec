@@ -8,7 +8,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 
 %global import_path github.com/containers/podman
 %global branch v4.9-rhel
-%global commit0 74407364841798d8b5b11ff45eaf83171dbcf82c
+%global commit0 e214173e14007f6f294930c382aac267ff1631a2
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -20,7 +20,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 4
 Name: podman
 Version: 4.9.4
-Release: 38%{?dist}
+Release: 39%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -415,6 +415,10 @@ fi
 %{_libexecdir}/%{name}/gvproxy
 
 %changelog
+* Fri Nov 06 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-39
+- update to the latest content of v4.9-rhel branch to fix CVE-2026-94603
+- Resolves: RHEL-271986
+
 * Thu Oct 22 2026 Jindrich Novy <jnovy@redhat.com> - 4:4.9.4-38
 - Rebuild for CVE-2026-78667 and CVE-2026-111943
 - Resolves: RHEL-278827 RHEL-287448
