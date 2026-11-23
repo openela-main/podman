@@ -4,8 +4,8 @@
 GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback ${BUILDTAGS:-}" -ldflags "${LDFLAGS:-} -linkmode=external -compressdwarf=false -B 0x$(head -c20 /dev/urandom|od -An -tx1|tr -d ' \\n') -extldflags '%__global_ldflags'" -a -v %{?**};
 
 %global import_path github.com/containers/podman
-#%%global branch v5.6-rhel
-%global commit0 6d48b6f12f793176f3f6bc808b5a440984c14eb2
+%global branch v5.8-rhel
+%global commit0 829bce126004e2201f4cfce238aa8ec096c4fee7
 %global shortcommit0 %(c=%{commit0}; echo ${c:0:7})
 %global cataver 0.1.7
 %global commit_dnsname bdc4ab85266ade865a7c398336e98721e62ef6b2
@@ -14,7 +14,7 @@ GO111MODULE=off go build -buildmode pie -compiler gc -tags="rpm_crashtraceback $
 Epoch: 6
 Name: podman
 Version: 5.8.5
-Release: 3%{?dist}
+Release: 5%{?dist}
 Summary: Manage Pods, Containers and Container Images
 License: Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND MPL-2.0
 URL: https://%{name}.io/
@@ -377,6 +377,17 @@ fi
 %{_datadir}/%{name}/test
 
 %changelog
+* Fri Nov 20 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.5-5
+- update to the latest content of https://gitlab.cee.redhat.com/containers/podman-staging/tree/v5.8-rhel
+  (https://gitlab.cee.redhat.com/containers/podman-staging/-/commit/829bce12)
+- fixes CVE-2026-19730 CVE-2026-17106 CVE-2026-94603
+- Resolves: RHEL-240088 RHEL-252467 RHEL-272010
+
+* Wed Nov 04 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.5-4
+- Rebuild for CVE fixes in Go standard library (CVE-2026-56853 CVE-2026-78667
+  CVE-2026-97031 CVE-2026-111943)
+- Resolves: RHEL-278804 RHEL-286789 RHEL-285433 RHEL-287590 RHEL-286284
+
 * Tue Sep 01 2026 Jindrich Novy <jnovy@redhat.com> - 6:5.8.5-3
 - Rebuild for CVE fixes in Go standard library
 - Resolves: RHEL-240088 RHEL-241284 RHEL-241400 RHEL-241610 RHEL-241788 RHEL-241921 RHEL-251888
